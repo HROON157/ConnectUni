@@ -1,30 +1,7 @@
-import Studentimage from "../assets/Student_Pic.jpeg.jpg"
-import Companyimage from "../assets/Companies.jpeg.jpg"
+import React from 'react'
+import { sections, heroContent } from '../data/homeData'
 
 const Home = () => {
-  const sections = [
-    {
-      id: 'students',
-      title: 'For Students',
-      description: 'Explore a wide range of projects and internships tailored to your skills and interests. Build your portfolio, gain valuable experience, and connect with leading companies.',
-      buttonText: 'Create Student Profile',
-      image: Studentimage,
-      imageAlt: 'Student working on laptop',
-      sectionClass: 'px-4 sm:px-6 lg:px-32 py-1',
-      gap: 'gap-3 lg:gap-6'
-    },
-    {
-      id: 'companies',
-      title: 'For Companies', 
-      description: 'Find talented students to work on your projects and internships. Post opportunities, review applications, and connect with the next generation of professionals.',
-      buttonText: 'Create Company Profile',
-      image: Companyimage,
-      imageAlt: 'Business professionals collaborating',
-      sectionClass: 'px-4 sm:px-6 lg:px-32 py-4',
-      gap: 'gap-8 lg:gap-12'
-    }
-  ]
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
       <section className="px-4 sm:px-4 lg:px-4 py-5 lg:py-5">
@@ -34,10 +11,7 @@ const Home = () => {
               Welcome to <span className="text-[#1E90FF]">ConnectUni</span>
             </h1>
             <p className="text-lg sm:text-xl lg:text-1xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
-              ConnectUni is a platform designed to connect university students
-              with opportunities in projects and internships. Our mission is to
-              bridge the gap between academic knowledge and real-world
-              experience.
+              {heroContent.description}
             </p>
           </div>
         </div>
