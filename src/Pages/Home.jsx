@@ -1,7 +1,7 @@
-import React from 'react'
 import { sections, heroContent } from '../data/homeData'
-
+import { useNavigate } from 'react-router-dom'
 const Home = () => {
+  const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
       <section className="px-4 sm:px-4 lg:px-4 py-5 lg:py-5">
@@ -39,7 +39,9 @@ const Home = () => {
                 <p className="text-lg text-[#4F7096] mb-6 leading-relaxed">
                   {section.description}
                 </p>
-                <button className="bg-[#1E90FF] text-white px-2 py-1 rounded-lg font-semibold cursor-pointer">
+                <button 
+                  onClick={()=> navigate(section.buttonRoute)} 
+                  className="bg-[#1E90FF] text-white px-2 py-1 rounded-lg font-semibold cursor-pointer">
                   {section.buttonText}
                 </button>
               </div>
