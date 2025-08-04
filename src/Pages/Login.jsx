@@ -41,7 +41,7 @@ const Login = () => {
       const result = await signIn(formData.email, formData.password);
       console.log("User signed in successfully:", result);
       
-      const { user, userData } = result;
+      const { userData } = result;
       
       
       toast.dismiss(loadingToastId);
@@ -50,10 +50,10 @@ const Login = () => {
      
       if (userData.role === 'student') {
         console.log("Redirecting to student dashboard");
-        setTimeout(() => navigate('/student-dashboard'), 1000);
+        setTimeout(() => navigate('/student-dashboard'), 1500);
       } else if (userData.role === 'hr') {
         console.log("Redirecting to HR dashboard");
-        setTimeout(() => navigate('/hr-dashboard'), 1000);
+        setTimeout(() => navigate('/hr-dashboard'), 1500);
       } else {
         console.log("Unknown role, redirecting to general dashboard");
         setTimeout(() => navigate('/dashboard'), 1000);
@@ -160,9 +160,6 @@ const Login = () => {
                 </span>
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1 sm:mt-2">
-              Use 8 or more characters with a mix of letters, numbers & symbols
-            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 space-y-3 sm:space-y-0">
@@ -172,7 +169,7 @@ const Login = () => {
               className={`w-full sm:w-auto font-medium py-3 px-6 sm:px-8 rounded-full transition-colors duration-200 text-sm sm:text-base ${
                 loading
                   ? 'bg-gray-300 cursor-not-allowed text-gray-500'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer'
               }`}
             >
               {loading ? 'Signing in...' : 'Log in'}

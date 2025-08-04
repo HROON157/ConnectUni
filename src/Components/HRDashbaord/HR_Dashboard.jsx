@@ -1,8 +1,9 @@
-import React from 'react'
-
+import HR_Home from "./HR_Home"
 const HR_Dashboard = () => {
-  return (
-    <div>HR_Dashboard</div>
+  return(
+    <>
+      <HR_Home />
+    </>
   )
 }
 
