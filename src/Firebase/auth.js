@@ -7,10 +7,12 @@ import {
 import { 
   doc, 
   setDoc, 
+  addDoc,
   getDoc, 
   collection, 
   query, 
   where, 
+  serverTimestamp,
   getDocs 
 } from 'firebase/firestore';
 import { auth, db } from './db';
@@ -172,6 +174,22 @@ export const getUsersByRole = async (role) => {
     return users;
   } catch (error) {
     console.error('Get users by role error:', error);
+    throw error;
+  }
+};
+
+// In your auth.js file
+export const addJobOpening = async (jobData) => {
+  try {
+    const docRef = await addDoc(collection(db, "jobOpenings"), {
+      ...jobData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    console.log("Document written with ID: ", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding document: ", error);
     throw error;
   }
 };

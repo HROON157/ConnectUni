@@ -1,8 +1,9 @@
-import React from 'react'
-
 const Std_Dashboard = () => {
+  const userName = localStorage.getItem('userName');  
   return (
-    <div>Std_Dashboard</div>
+    <div>
+      <p>Hello, {userName}</p>
+    </div>
   )
 }
 
