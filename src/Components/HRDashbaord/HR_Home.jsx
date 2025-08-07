@@ -1,61 +1,101 @@
-import { useState, useEffect } from 'react';
-import { getDashboardData } from '../Charts/ChartData';
-import { PieChartCard, BarChartCard, LineChartCard } from '../Charts/PieChartCard';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { getDashboardData } from "../Charts/ChartData";
+import {
+  PieChartCard,
+  BarChartCard,
+  LineChartCard,
+} from "../Charts/PieChartCard";
+import { Link } from "react-router-dom";
+import { getJobOpenings,closeJobOpening } from "../../Firebase/auth";
+
 const HR_Home = () => {
-  const userName = localStorage.getItem('userName');
+  const userName = localStorage.getItem("userName");
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [jobOpenings, setJobOpenings] = useState([]);
+  const [closingJob, setClosingJob] = useState(null);
+    const handleCloseJob = async (jobId) => {
+    if (window.confirm("Are you sure you want to close this job opening?")) {
+      try {
+        setClosingJob(jobId);
+        await closeJobOpening(jobId);
+        const updatedOpenings = await getJobOpenings();
+        setJobOpenings(updatedOpenings);
+      } catch (error) {
+        console.error("Error closing job opening:", error);
+        alert("Failed to close job opening. Please try again.");
+      } finally {
+        setClosingJob(null);
+      }
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getDashboardData();
         setDashboardData(data);
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error("Error loading dashboard data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-    
-    
+
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("Fetching job openings from component...");
+        const data = await getJobOpenings();
+        console.log("Job openings received:", data);
+        setJobOpenings(data);
+      } catch (error) {
+        console.error("Error loading job openings:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">Loading...</div>
+    );
   }
 
   return (
     <div className="ml-2 sm:ml-4 md:ml-6 lg:ml-8 p-4">
-      <p className="text-[#0D141C] text-xl sm:text-base md:text-lg lg:text-xl text-center font-semibold mt-2 " 
-         style={{fontFamily:'Public Sans'}}>
+      <p
+        className="text-[#0D141C] text-xl sm:text-base md:text-lg lg:text-xl text-center font-semibold mt-2 "
+        style={{ fontFamily: "Public Sans" }}
+      >
         Welcome to the HR Dashboard
       </p>
-      <p className="text-[#0D141C] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mt-2" 
-         style={{fontFamily:'Public Sans'}}>
+      <p
+        className="text-[#0D141C] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mt-2"
+        style={{ fontFamily: "Public Sans" }}
+      >
         Hello, {userName}
       </p>
 
-      
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-6">Stats</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <PieChartCard 
+          <PieChartCard
             title="Total Jobs"
             count={dashboardData?.totalJobs.count}
             data={dashboardData?.totalJobs.breakdown}
           />
-          <BarChartCard 
+          <BarChartCard
             title="Universities"
             count={dashboardData?.universities.count}
             data={dashboardData?.universities.breakdown}
           />
-          <LineChartCard 
+          <LineChartCard
             title="Total Hirings"
             count={dashboardData?.totalHirings.count}
             percentage={dashboardData?.totalHirings.percentage}
@@ -63,30 +103,91 @@ const HR_Home = () => {
           />
         </div>
       </div>
+
       <div className="mt-8">
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <button className="group bg-gradient-to-br from-blue-100 to-blue-200 hover:from-blue-200 hover:to-blue-300 transition-all duration-300 rounded-xl shadow-md p-6 cursor-pointer border border-blue-300 hover:shadow-xl">
+            <Link to="/past-openings">
+              <h3 className="text-lg font-semibold text-center text-blue-800 group-hover:text-blue-900 transition">
+                📂 Past Openings
+              </h3>
+            </Link>
+          </button>
 
-    <button className="group bg-gradient-to-br from-blue-100 to-blue-200 hover:from-blue-200 hover:to-blue-300 transition-all duration-300 rounded-xl shadow-md p-6 cursor-pointer border border-blue-300 hover:shadow-xl">
-      <Link to="/past-openings"><h3 className="text-lg font-semibold text-center text-blue-800 group-hover:text-blue-900 transition">📂 Past Openings</h3></Link>
-    </button>
+          <button className="group bg-gradient-to-br from-green-100 to-green-200 hover:from-green-200 hover:to-green-300 transition-all duration-300 rounded-xl shadow-md p-6 cursor-pointer border border-green-300 hover:shadow-xl">
+            <Link to="/add-new-opening">
+              <h3 className="text-lg font-semibold text-center text-green-800 group-hover:text-green-900 transition">
+                ➕ Add New
+              </h3>
+            </Link>
+          </button>
 
-    <button className="group bg-gradient-to-br from-green-100 to-green-200 hover:from-green-200 hover:to-green-300 transition-all duration-300 rounded-xl shadow-md p-6 cursor-pointer border border-green-300 hover:shadow-xl">
-      <Link to="/add-new-opening"><h3 className="text-lg font-semibold text-center text-green-800 group-hover:text-green-900 transition">➕ Add New</h3></Link>
-    </button>
+          <button className="group bg-gradient-to-br from-purple-100 to-purple-200 hover:from-purple-200 hover:to-purple-300 transition-all duration-300 rounded-xl shadow-md p-6 cursor-pointer border border-purple-300 hover:shadow-xl">
+            <Link to="/browse-universities">
+              <h3 className="text-lg font-semibold text-center text-purple-800 group-hover:text-purple-900 transition">
+                🎓 Browse Universities
+              </h3>
+            </Link>
+          </button>
+        </div>
+      </div>
 
-    <button className="group bg-gradient-to-br from-purple-100 to-purple-200 hover:from-purple-200 hover:to-purple-300 transition-all duration-300 rounded-xl shadow-md p-6 cursor-pointer border border-purple-300 hover:shadow-xl">
-      <Link to="/browse-universities"><h3 className="text-lg font-semibold text-center text-purple-800 group-hover:text-purple-900 transition">🎓 Browse Universities</h3></Link>
-    </button>
-
-  </div>
-</div>
-
-      
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-6">Current Openings</h2>
-        
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <p className="text-gray-500 text-center">Current openings will be displayed here</p>
+
+        <div className="space-y-4">
+          {jobOpenings.length > 0 ? (
+            jobOpenings.map((job) => (
+              <div
+                key={job.id}
+                className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              >
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  {job.jobTitle}
+                </h3>
+
+                <p className="text-gray-600 mb-4 line-clamp-3">
+                  {job.jobDescription}
+                </p>
+                <p className="text-gray-600 mb-4 line-clamp-3">
+                  {job.createdAt
+                    ? `Posted on: ${new Date(
+                        job.createdAt.seconds * 1000
+                      ).toLocaleDateString()}`
+                    : "Posted on: Unknown"}
+                </p>
+                            <div className="flex justify-start space-x-3">
+                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    View Applications
+                  </button>
+                  <button 
+                    onClick={() => handleCloseJob(job.id)}
+                    disabled={closingJob === job.id}
+                    className="bg-red-100 hover:bg-red-200 text-red-700 cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {closingJob === job.id ? "Closing..." : "Close Opening"}
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No job openings yet
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Start by creating your first job opening
+                </p>
+                <Link
+                  to="/add-new-opening"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Create Job Opening
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -11,6 +11,10 @@ import "react-toastify/dist/ReactToastify.css";
 import StudentDashboard from './Components/StudentDashboard/Std_Dashboard'
 import HRDashboard from './Components/HRDashbaord/HR_Dashboard'
 import New_Openings from './Components/HRDashbaord/New_Openings'
+import Uni_Home from './Components/UniProfile/Uni_Home'
+import BNU_Profile from './Components/UniProfile/BNU_Profile'
+import UMT_Profile from './Components/UniProfile/UMT_Profile'
+import PastOpening from './Components/HRDashbaord/PastOpening'
 function App() {
   return (
     <BrowserRouter>
@@ -28,6 +32,10 @@ function App() {
           <Route path="/student-dashboard" element={<StudentDashboard />} />
           <Route path="/hr-dashboard" element={<HRDashboard />} />
           <Route path="/add-new-opening" element={<New_Openings />} />
+          <Route path='/browse-universities' element={<Uni_Home />} />
+          <Route path='/bnu-profile' element={<BNU_Profile />} />
+          <Route path='/umt-profile' element={<UMT_Profile />} />
+          <Route path='/past-openings' element={<PastOpening />} />
         </Routes>
         
       </div>
