@@ -6,7 +6,7 @@ export const getDashboardData = async () => {
     return data;
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
-    // Return mock data as fallback
+   
     return getMockData();
   }
 };
