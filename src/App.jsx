@@ -15,6 +15,8 @@ import Uni_Home from './Components/UniProfile/Uni_Home'
 import BNU_Profile from './Components/UniProfile/BNU_Profile'
 import UMT_Profile from './Components/UniProfile/UMT_Profile'
 import PastOpening from './Components/HRDashbaord/PastOpening'
+import HR_Profile from './Components/HRDashbaord/HR_Profile'
+
 function App() {
   return (
     <BrowserRouter>
@@ -36,6 +38,7 @@ function App() {
           <Route path='/bnu-profile' element={<BNU_Profile />} />
           <Route path='/umt-profile' element={<UMT_Profile />} />
           <Route path='/past-openings' element={<PastOpening />} />
+          <Route path='/hr-profile' element={<HR_Profile />} />
         </Routes>
         
       </div>

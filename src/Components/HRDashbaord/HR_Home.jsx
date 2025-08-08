@@ -6,7 +6,10 @@ import {
   LineChartCard,
 } from "../Charts/PieChartCard";
 import { Link } from "react-router-dom";
-import { getJobOpenings,closeJobOpening } from "../../Firebase/auth";
+import { getJobOpenings, closeJobOpening } from "../../Firebase/auth";
+import { doc, getDoc } from 'firebase/firestore';
+import { db, auth } from "../../Firebase/db";
+import { onAuthStateChanged } from 'firebase/auth';
 
 const HR_Home = () => {
   const userName = localStorage.getItem("userName");
@@ -14,7 +17,48 @@ const HR_Home = () => {
   const [loading, setLoading] = useState(true);
   const [jobOpenings, setJobOpenings] = useState([]);
   const [closingJob, setClosingJob] = useState(null);
-    const handleCloseJob = async (jobId) => {
+  const [hrProfile, setHrProfile] = useState(null);
+  const [user, setUser] = useState(null);
+
+  const fetchHRProfile = async () => {
+    try {
+      const uid = user?.uid || localStorage.getItem('uid');
+      if (!uid || uid === 'null' || uid === 'undefined') return;
+
+      const docRef = doc(db, 'hrProfiles', uid);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        setHrProfile(docSnap.data());
+      }
+    } catch (error) {
+      console.error('Error fetching HR profile:', error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        fetchHRProfile();
+      } else {
+        const storedUID = localStorage.getItem('uid');
+        if (storedUID && storedUID !== 'null' && storedUID !== 'undefined') {
+          setUser({ uid: storedUID });
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchHRProfile();
+    }
+  }, [user]);
+
+  const handleCloseJob = async (jobId) => {
     if (window.confirm("Are you sure you want to close this job opening?")) {
       try {
         setClosingJob(jobId);
@@ -29,6 +73,7 @@ const HR_Home = () => {
       }
     }
   };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -46,6 +91,7 @@ const HR_Home = () => {
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -142,31 +188,60 @@ const HR_Home = () => {
                 key={job.id}
                 className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
               >
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  {job.jobTitle}
-                </h3>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      {job.jobTitle}
+                    </h3>
 
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {job.jobDescription}
-                </p>
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {job.createdAt
-                    ? `Posted on: ${new Date(
-                        job.createdAt.seconds * 1000
-                      ).toLocaleDateString()}`
-                    : "Posted on: Unknown"}
-                </p>
-                            <div className="flex justify-start space-x-3">
-                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                    View Applications
-                  </button>
-                  <button 
-                    onClick={() => handleCloseJob(job.id)}
-                    disabled={closingJob === job.id}
-                    className="bg-red-100 hover:bg-red-200 text-red-700 cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {closingJob === job.id ? "Closing..." : "Close Opening"}
-                  </button>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {job.jobDescription}
+                    </p>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {job.createdAt
+                        ? `Posted on: ${new Date(
+                            job.createdAt.seconds * 1000
+                          ).toLocaleDateString()}`
+                        : "Posted on: Unknown"}
+                    </p>
+                    <div className="flex justify-start space-x-3">
+                      <button className="bg-blue-100 hover:bg-blue-200 text-blue-700 cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        View Applications
+                      </button>
+                      <button 
+                        onClick={() => handleCloseJob(job.id)}
+                        disabled={closingJob === job.id}
+                        className="bg-red-100 hover:bg-red-200 text-red-700 cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {closingJob === job.id ? "Closing..." : "Close Opening"}
+                      </button>
+                    </div>
+                  </div>
+                  
+               
+                  <div className="ml-6 flex-shrink-0">
+                    <div className="w-[170px] h-[170px] bg-gray-100 rounded-lg flex items-center justify-center shadow-sm border">
+                      {hrProfile?.companyLogo ? (
+                        <img 
+                          src={hrProfile.companyLogo} 
+                          alt={hrProfile.company || "Company Logo"} 
+                          className="w-full h-full object-cover rounded-lg"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-blue-200 rounded flex items-center justify-center">
+                          <span className="text-blue-600 text-xs font-bold">
+                            {hrProfile?.company?.charAt(0) || 'C'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {/* {hrProfile?.company && (
+                      <p className="text text-gray-500 text-center mt-1 max-w-16 ">
+                        {hrProfile.company}
+                      </p>
+                    )} */}
+                  </div>
                 </div>
               </div>
             ))

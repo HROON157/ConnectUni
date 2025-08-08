@@ -41,7 +41,7 @@ const Login = () => {
       const result = await signIn(formData.email, formData.password);
       console.log("User signed in successfully:", result);
       
-      const { userData } = result;
+      const { userData,user } = result;
       
       
       toast.dismiss(loadingToastId);
@@ -52,8 +52,8 @@ const Login = () => {
         console.log("Redirecting to student dashboard");
         setTimeout(() => navigate('/student-dashboard'), 1500);
       } else if (userData.role === 'hr') {
-        console.log("Redirecting to HR dashboard");
-        setTimeout(() => navigate('/hr-dashboard'), 1500);
+        console.log("Redirecting to HR profile");
+        setTimeout(() => navigate('/hr-profile'), 1500);
       } else {
         console.log("Unknown role, redirecting to general dashboard");
         setTimeout(() => navigate('/dashboard'), 1000);
@@ -62,6 +62,8 @@ const Login = () => {
       
       localStorage.setItem('userRole', userData.role);
       localStorage.setItem('userName', userData.profileName);
+      localStorage.setItem('uid', user.uid);
+          console.log('UID stored in localStorage:', user.uid);
       
     } catch (error) {
       console.error("Login error:", error);
