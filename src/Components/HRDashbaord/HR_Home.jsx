@@ -12,7 +12,7 @@ import { db, auth } from "../../Firebase/db";
 import { onAuthStateChanged } from 'firebase/auth';
 
 const HR_Home = () => {
-  const userName = localStorage.getItem("userName");
+  // const userName = localStorage.getItem("userName");
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [jobOpenings, setJobOpenings] = useState([]);
@@ -27,7 +27,8 @@ const HR_Home = () => {
 
       const docRef = doc(db, 'hrProfiles', uid);
       const docSnap = await getDoc(docRef);
-      
+
+
       if (docSnap.exists()) {
         setHrProfile(docSnap.data());
       }
@@ -35,7 +36,9 @@ const HR_Home = () => {
       console.error('Error fetching HR profile:', error);
     }
   };
-
+  const getDisplayName = () =>{
+    return hrProfile?.name || localStorage.getItem('userName') || 'HR User';
+  }
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -125,7 +128,7 @@ const HR_Home = () => {
         className="text-[#0D141C] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mt-2"
         style={{ fontFamily: "Public Sans" }}
       >
-        Hello, {userName}
+        Hello, {getDisplayName()}
       </p>
 
       <div className="mt-8">
