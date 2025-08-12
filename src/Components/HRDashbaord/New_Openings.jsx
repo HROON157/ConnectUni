@@ -3,6 +3,7 @@ import { addJobOpening } from "../../Firebase/auth";
 import { auth } from "../../Firebase/db";
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { HiOutlineBriefcase, HiOutlineDocumentText, HiOutlineMapPin, HiOutlineCurrencyDollar, HiOutlineClipboardDocumentList, HiOutlineSparkles, HiOutlineInformationCircle } from 'react-icons/hi2';
 
 const New_Openings = () => {
   const [formData, setFormData] = useState({
@@ -120,7 +121,6 @@ const New_Openings = () => {
         requirements: "",
       });
       
-    
       setTimeout(() => {
         navigate('/hr-dashboard');
       }, 2000);
@@ -147,264 +147,347 @@ const New_Openings = () => {
   };
 
   return (
-    <>
-      <div className="mr-6 sm:mr-8 md:mr-10 lg:ml-12 p-4">
-        <h2
-          className="text-3xl font-bold mb-6 text-[#0D141C]"
-          style={{ fontFamily: "Public Sans" }}
-        >
-          Add New Opening
-        </h2>
-        <div
-          style={{ width: "100%", marginTop: "40px" }}
-          className="border-t border-[#66666640]"
-        ></div>
-        <p
-          className="mt-5 text-xl font-bold text-[#0D141C]"
-          style={{ lineHeight: "40px" }}
-        >
-          Yay, A new job!
-        </p>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-          <div className="space-y-4">
-            <input
-              type="text"
-              name="jobTitle"
-              value={formData.jobTitle}
-              onChange={handleInputChange}
-              placeholder="Job Title"
-              className={`border p-3 rounded-lg w-full ${
-                errors.jobTitle ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.jobTitle && (
-              <p className="text-red-500 text-sm">{errors.jobTitle}</p>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <HiOutlineBriefcase className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Public Sans" }}>
+                Create New Job Opening
+              </h1>
+              <p className="text-gray-600" style={{ fontFamily: "Public Sans" }}>
+                🎉 Ready to find amazing talent? Let's create your next job opportunity!
+              </p>
+            </div>
+          </div>
+          
+          {/* Progress Indicator */}
+          <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-200 mb-6">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Step 1 of 1</span>
+              <span className="text-blue-600 font-semibold">Job Details</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div className="bg-gradient-to-r from-purple-500 to-blue-600 h-2 rounded-full w-full"></div>
+            </div>
+          </div>
+        </div>
 
-            <textarea
-              name="jobDescription"
-              value={formData.jobDescription}
-              onChange={handleInputChange}
-              placeholder="Job Description"
-              rows="3"
-              className={`border p-3 rounded-lg w-full resize-none ${
-                errors.jobDescription ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.jobDescription && (
-              <p className="text-red-500 text-sm">{errors.jobDescription}</p>
-            )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Form Section */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center" style={{ fontFamily: "Public Sans" }}>
+                <HiOutlineDocumentText className="w-6 h-6 mr-2 text-purple-500" />
+                Job Information
+              </h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Job Title */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
+                    <HiOutlineBriefcase className="w-4 h-4 inline mr-1" />
+                    Job Title *
+                  </label>
+                  <input
+                    type="text"
+                    name="jobTitle"
+                    value={formData.jobTitle}
+                    onChange={handleInputChange}
+                    placeholder="e.g. Software Engineer, Marketing Intern"
+                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      errors.jobTitle ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    style={{ fontFamily: "Public Sans" }}
+                  />
+                  {errors.jobTitle && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <HiOutlineInformationCircle className="w-4 h-4 mr-1" />
+                      {errors.jobTitle}
+                    </p>
+                  )}
+                </div>
 
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleInputChange}
-              className={`border p-3 rounded-lg w-full ${
-                errors.type ? 'border-red-500' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Type (Internship, Job, Other)</option>
-              <option value="internship">Internship</option>
-              <option value="job">Full-time Job</option>
-              <option value="part-time">Part-time</option>
-              <option value="other">Other</option>
-            </select>
-            {errors.type && (
-              <p className="text-red-500 text-sm">{errors.type}</p>
-            )}
+                {/* Job Description */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
+                    <HiOutlineDocumentText className="w-4 h-4 inline mr-1" />
+                    Job Description *
+                  </label>
+                  <textarea
+                    name="jobDescription"
+                    value={formData.jobDescription}
+                    onChange={handleInputChange}
+                    placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
+                    rows="4"
+                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
+                      errors.jobDescription ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    style={{ fontFamily: "Public Sans" }}
+                  />
+                  {errors.jobDescription && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <HiOutlineInformationCircle className="w-4 h-4 mr-1" />
+                      {errors.jobDescription}
+                    </p>
+                  )}
+                </div>
 
-            <select
-              name="compensation"
-              value={formData.compensation}
-              onChange={handleInputChange}
-              className={`border p-3 rounded-lg w-full ${
-                errors.compensation ? 'border-red-500' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Compensation (Paid/Unpaid)</option>
-              <option value="paid">Paid</option>
-              <option value="unpaid">Unpaid</option>
-              <option value="stipend">Stipend</option>
-            </select>
-            {errors.compensation && (
-              <p className="text-red-500 text-sm">{errors.compensation}</p>
-            )}
+                {/* Type and Compensation Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Job Type */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
+                      Job Type *
+                    </label>
+                    <select
+                      name="type"
+                      value={formData.type}
+                      onChange={handleInputChange}
+                      className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        errors.type ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                      style={{ fontFamily: "Public Sans" }}
+                    >
+                      <option value="">Select job type</option>
+                      <option value="internship">🎓 Internship</option>
+                      <option value="job">💼 Full-time Job</option>
+                      <option value="part-time">⏰ Part-time</option>
+                      <option value="other">🔧 Other</option>
+                    </select>
+                    {errors.type && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <HiOutlineInformationCircle className="w-4 h-4 mr-1" />
+                        {errors.type}
+                      </p>
+                    )}
+                  </div>
 
-            <input
-              type="text"
-              name="payRange"
-              value={formData.payRange}
-              onChange={handleInputChange}
-              placeholder="Pay Range (If Paid)"
-              className="border border-gray-300 p-3 rounded-lg w-full"
-            />
+                  {/* Compensation */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
+                      <HiOutlineCurrencyDollar className="w-4 h-4 inline mr-1" />
+                      Compensation *
+                    </label>
+                    <select
+                      name="compensation"
+                      value={formData.compensation}
+                      onChange={handleInputChange}
+                      className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        errors.compensation ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                      style={{ fontFamily: "Public Sans" }}
+                    >
+                      <option value="">Select compensation</option>
+                      <option value="paid">💰 Paid</option>
+                      <option value="unpaid">🤝 Unpaid</option>
+                      <option value="stipend">💵 Stipend</option>
+                    </select>
+                    {errors.compensation && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <HiOutlineInformationCircle className="w-4 h-4 mr-1" />
+                        {errors.compensation}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              placeholder="Location"
-              className={`border p-3 rounded-lg w-full ${
-                errors.location ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.location && (
-              <p className="text-red-500 text-sm">{errors.location}</p>
-            )}
+                {/* Pay Range */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
+                    <HiOutlineCurrencyDollar className="w-4 h-4 inline mr-1" />
+                    Pay Range <span className="text-gray-400">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="payRange"
+                    value={formData.payRange}
+                    onChange={handleInputChange}
+                    placeholder="e.g. $3000-5000/month, Rs. 50,000-80,000"
+                    className="w-full p-4 border border-gray-300 rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-400"
+                    style={{ fontFamily: "Public Sans" }}
+                  />
+                </div>
 
-            <textarea
-              name="requirements"
-              value={formData.requirements}
-              onChange={handleInputChange}
-              placeholder="Requirements"
-              rows="3"
-              className={`border p-3 rounded-lg w-full resize-none ${
-                errors.requirements ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.requirements && (
-              <p className="text-red-500 text-sm">{errors.requirements}</p>
-            )}
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
+                    <HiOutlineMapPin className="w-4 h-4 inline mr-1" />
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    placeholder="e.g. Lahore, Pakistan or Remote"
+                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      errors.location ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    style={{ fontFamily: "Public Sans" }}
+                  />
+                  {errors.location && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <HiOutlineInformationCircle className="w-4 h-4 mr-1" />
+                      {errors.location}
+                    </p>
+                  )}
+                </div>
 
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className={`${
-                loading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-[#5E5BFF] hover:bg-[#4B47FF] transform hover:scale-105 active:scale-95 cursor-pointer'
-              } text-white p-3 rounded-lg w-full font-semibold transition-all duration-200 shadow-lg`}
-            >
-              {loading ? '⏳ Creating...' : '✨ Add Opening'}
-            </button>
+                {/* Requirements */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
+                    <HiOutlineClipboardDocumentList className="w-4 h-4 inline mr-1" />
+                    Requirements *
+                  </label>
+                  <textarea
+                    name="requirements"
+                    value={formData.requirements}
+                    onChange={handleInputChange}
+                    placeholder="List the essential qualifications, skills, and experience needed for this role..."
+                    rows="4"
+                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
+                      errors.requirements ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    style={{ fontFamily: "Public Sans" }}
+                  />
+                  {errors.requirements && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <HiOutlineInformationCircle className="w-4 h-4 mr-1" />
+                      {errors.requirements}
+                    </p>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-6">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg ${
+                      loading 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 transform hover:scale-105 active:scale-95 cursor-pointer'
+                    } text-white`}
+                    style={{ fontFamily: "Public Sans" }}
+                  >
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Creating Opening...</span>
+                      </>
+                    ) : (
+                      <>
+                        <HiOutlineSparkles className="w-5 h-5" />
+                        <span>Create Job Opening</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
 
-          <div>
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 h-fit">
-              <h3 className="text-lg font-bold text-[#0D141C] mb-4">
-                📋 Job Posting Rules
+          {/* Guidelines Section */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sticky top-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center" style={{ fontFamily: "Public Sans" }}>
+                <HiOutlineInformationCircle className="w-5 h-5 mr-2 text-blue-500" />
+                Posting Guidelines
               </h3>
-              <div className="space-y-3 text-sm text-gray-700">
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    1.
-                  </span>
-                  <p>
-                    <strong>Clear Title & Description:</strong> Ensure the job
-                    title and description accurately reflect the role and
-                    responsibilities.
-                  </p>
-                </div>
+              
+              <div className="space-y-4 text-sm text-gray-700">
+                {[
+                  {
+                    icon: "✏️",
+                    title: "Clear & Descriptive",
+                    desc: "Write clear job titles and detailed descriptions"
+                  },
+                  {
+                    icon: "🎯",
+                    title: "Specify Job Type",
+                    desc: "Choose the correct category for your position"
+                  },
+                  {
+                    icon: "💰",
+                    title: "Transparent Compensation",
+                    desc: "Be clear about payment and benefits"
+                  },
+                  {
+                    icon: "📍",
+                    title: "Location Details",
+                    desc: "Include specific location or remote options"
+                  },
+                  {
+                    icon: "📋",
+                    title: "Essential Requirements",
+                    desc: "List only necessary qualifications"
+                  },
+                  {
+                    icon: "📅",
+                    title: "Application Process",
+                    desc: "Provide clear application instructions"
+                  },
+                  {
+                    icon: "⚖️",
+                    title: "Equal Opportunity",
+                    desc: "Follow non-discrimination guidelines"
+                  },
+                  {
+                    icon: "🔄",
+                    title: "Keep Updated",
+                    desc: "Remove postings when position is filled"
+                  }
+                ].map((guideline, index) => (
+                  <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <span className="text-lg flex-shrink-0">{guideline.icon}</span>
+                    <div>
+                      <p className="font-semibold text-gray-900" style={{ fontFamily: "Public Sans" }}>
+                        {guideline.title}
+                      </p>
+                      <p className="text-gray-600 text-xs" style={{ fontFamily: "Public Sans" }}>
+                        {guideline.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    2.
-                  </span>
-                  <p>
-                    <strong>Position Type:</strong> Select the appropriate job
-                    type: [Internship, Full-time, Part-time, Contract].
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    3.
-                  </span>
-                  <p>
-                    <strong>Compensation:</strong> Specify whether the job is
-                    Paid or Unpaid. For unpaid, include any benefits or
-                    stipends.
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    4.
-                  </span>
-                  <p>
-                    <strong>Location:</strong> Include the job location or
-                    mention if the role is remote.
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    5.
-                  </span>
-                  <p>
-                    <strong>Requirements:</strong> List essential qualifications
-                    and skills clearly.
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    6.
-                  </span>
-                  <p>
-                    <strong>Application Instructions:</strong> Provide clear
-                    instructions and the application deadline (if any).
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    7.
-                  </span>
-                  <p>
-                    <strong>Non-Discrimination:</strong> Follow local labor laws
-                    and ensure a non-discriminatory posting.
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    8.
-                  </span>
-                  <p>
-                    <strong>Job Expiry:</strong> Remove postings once the
-                    position is filled or after the expiry date.
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    9.
-                  </span>
-                  <p>
-                    <strong>No Spam or Duplicates:</strong> Only post unique,
-                    relevant job openings.
-                  </p>
-                </div>
-
-                <div className="flex items-start">
-                  <span className="font-bold text-[#5E5BFF] mr-2 min-w-[20px]">
-                    10.
-                  </span>
-                  <p>
-                    <strong>Ethical Compliance:</strong> Ensure the job complies
-                    with labor laws and ethical standards.
-                  </p>
-                </div>
+              {/* Quick Tips */}
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-blue-900 mb-2" style={{ fontFamily: "Public Sans" }}>
+                  💡 Pro Tips
+                </h4>
+                <ul className="text-xs text-blue-800 space-y-1" style={{ fontFamily: "Public Sans" }}>
+                  <li>• Use keywords students search for</li>
+                  <li>• Highlight growth opportunities</li>
+                  <li>• Mention company culture</li>
+                  <li>• Include application deadline</li>
+                </ul>
               </div>
             </div>
           </div>
         </div>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
+      </div>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
         theme="light"
+        className="mt-16"
       />
-      </div>
-    </>
+    </div>
   );
 };
 

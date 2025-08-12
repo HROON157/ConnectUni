@@ -27,6 +27,5 @@ export const sections = [
 ]
 
 export const heroContent = {
-  title: 'Welcome to ConnectUni',
   description: 'ConnectUni is a platform designed to connect university students with opportunities in projects and internships. Our mission is to bridge the gap between academic knowledge and real-world experience.'
 }

@@ -1,49 +1,202 @@
-import BnuImage from "../../assets/bnu-Logo.png"
+import React from "react";
+import BnuImage from "../../assets/BNU-Logo.png";
 import UmtLogo from "../../assets/UMT-Logo.png";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
+import { HiOutlineAcademicCap, HiOutlineUsers, HiOutlineMapPin, HiOutlineGlobeAlt, HiOutlineArrowRight } from "react-icons/hi2";
+
 const Uni_Home = () => {
-  return (
-    <div className='p-4 ml-6 sm:ml-8 md:ml-10 lg:ml-12'>
-        <p className='text-xl sm:text-base md:text-lg lg:text-xl ' 
-        style={{fontFamily:'Public Sans',fontWeight:'700',fontSize:'32px'}}>Universities</p>
-        <p className='mt-5 ' style={{
-            fontSize:'14px',
-            fontFamily:'Public Sans',fontWeight:'700',color:'#0D141C' 
-        }}>All</p> 
-        <div className='border-t border-[#D1DBE8] mt-5' style={{width:'100%'}}></div>
-                <div className='mt-5 flex items-center justify-between'>
-            <div className='flex items-center'>
-                <img src={BnuImage} alt="BNU_Logo" width={56} height={56} style={{borderRadius:'8px'}} />
-                <div className='ml-2'>
-                    <p className='font-bold text-base' style={{fontFamily:'Public Sans'}}>Beaconhouse National University (BNU)</p>
-                    
-                </div>
+  const universities = [
+    {
+      id: 1,
+      name: "Beaconhouse National University",
+      shortName: "BNU",
+      logo: BnuImage,
+      location: "Lahore, Pakistan",
+      type: "Private University",
+      students: "8,000+",
+      programs: "50+",
+      established: "2003",
+      description: "A leading private university known for its innovative programs and modern campus facilities.",
+      link: "/bnu-profile",
+      color: "from-blue-600 to-purple-900",
+     
+    },
+    {
+      id: 2,
+      name: "University of Management and Technology",
+      shortName: "UMT",
+      logo: UmtLogo,
+      location: "Lahore, Pakistan",
+      type: "Private University",
+      students: "12,000+",
+      programs: "60+",
+      established: "1990",
+      description: "Premier institution focused on management, technology, and engineering excellence.",
+      link: "/umt-profile",
+      color: "from-blue-600 to-purple-800",
+      
+    }
+  ];
+
+  const UniversityCard = ({ university }) => (
+    <div className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200">
+      {/* Background Gradient Overlay */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${university.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+      
+      {/* Card Content */}
+      <div className="relative p-6">
+        {/* Header Section */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-4">
+            {/* University Logo */}
+            <div className="relative">
+              <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg ring-4 ring-white group-hover:ring-opacity-50 transition-all duration-300">
+                <img 
+                  src={university.logo} 
+                  alt={`${university.shortName} Logo`} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+              </div>
+              {/* Floating Badge */}
+              <div className={`absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r ${university.color} rounded-full flex items-center justify-center shadow-lg`}>
+                <HiOutlineAcademicCap className="w-3 h-3 text-white" />
+              </div>
             </div>
-            <Link to="/bnu-profile">
-            <button className='bg-blue-600 text-white px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer text-xs sm:text-sm md:text-base' 
-                    style={{fontFamily:'Public Sans'}}>
-                View Profile
-            </button>
-            </Link>
+
+            {/* University Info */}
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300" style={{fontFamily:'Public Sans'}}>
+                {university.name}
+              </h3>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <HiOutlineMapPin className="w-4 h-4" />
+                <span>{university.location}</span>
+              </div>
+              <div className="flex items-center space-x-1 mt-1">
+                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  {university.type}
+                </span>
+                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                  Est. {university.established}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className='mt-4 flex items-center justify-between'>
-            <div className='flex items-center'>
-                <img src={UmtLogo} alt="UMT_Logo" width={56} height={56} style={{borderRadius:'8px'}} />
-                <div className='ml-2'>
-                    <p className='font-bold text-base' style={{fontFamily:'Public Sans'}}>University of Management and Technology (UMT)</p>
-                    
-                </div>
-            </div>
-            <Link to="/umt-profile">
-            <button className='bg-blue-600 text-white px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer text-xs sm:text-sm md:text-base' 
-                    style={{fontFamily:'Public Sans'}}>
-                View Profile
-            </button>
-            </Link>
+        {/* Description */}
+        <p className="text-gray-600 text-sm mb-4 leading-relaxed" style={{fontFamily:'Public Sans'}}>
+          {university.description}
+        </p>
+
+        {/* Stats Section */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <HiOutlineUsers className="w-5 h-5 mx-auto mb-1 text-blue-500" />
+            <div className="text-lg font-bold text-gray-900">{university.students}</div>
+            <div className="text-xs text-gray-500">Students</div>
+          </div>
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <HiOutlineAcademicCap className="w-5 h-5 mx-auto mb-1 text-purple-500" />
+            <div className="text-lg font-bold text-gray-900">{university.programs}</div>
+            <div className="text-xs text-gray-500">Programs</div>
+          </div>
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <HiOutlineGlobeAlt className="w-5 h-5 mx-auto mb-1 text-green-500" />
+            <div className="text-lg font-bold text-gray-900">A+</div>
+            <div className="text-xs text-gray-500">Rating</div>
+          </div>
         </div>
+
+        {/* Action Button */}
+        <Link to={university.link}>
+          <button className={`w-full bg-gradient-to-r ${university.color} ${university.hoverColor} text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl group-hover:scale-105`} style={{fontFamily:'Public Sans'}}>
+            <span>View Profile</span>
+            <HiOutlineArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+          </button>
+        </Link>
+      </div>
+
+      {/* Decorative Elements */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-400/10 to-yellow-600/10 rounded-full translate-y-12 -translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
     </div>
-  )
-}
+  );
 
-export default Uni_Home
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <HiOutlineAcademicCap className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{fontFamily:'Public Sans'}}>
+                Partner Universities
+              </h1>
+              <p className="text-gray-600" style={{fontFamily:'Public Sans'}}>
+                Discover leading institutions shaping the future of education
+              </p>
+            </div>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-1">2</div>
+                <div className="text-sm text-gray-600">Universities</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-600 mb-1">20K+</div>
+                <div className="text-sm text-gray-600">Students</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-600 mb-1">110+</div>
+                <div className="text-sm text-gray-600">Programs</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-orange-600 mb-1">95%</div>
+                <div className="text-sm text-gray-600">Success Rate</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Section */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <h2 className="text-xl font-semibold text-gray-900" style={{fontFamily:'Public Sans'}}>All Universities</h2>
+              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                {universities.length} institutions
+              </span>
+            </div>
+            
+            {/* Filter Options */}
+            <div className="hidden md:flex items-center space-x-2">
+              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium shadow-md" style={{fontFamily:'Public Sans'}}>
+                All
+              </button>
+              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors" style={{fontFamily:'Public Sans'}}>
+                Private
+              </button>
+              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors" style={{fontFamily:'Public Sans'}}>
+                Public
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Universities Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {universities.map((university) => (
+            <UniversityCard key={university.id} university={university} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Uni_Home;

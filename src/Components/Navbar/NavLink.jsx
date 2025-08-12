@@ -1,29 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { textStyles } from "../../data/navData";
 
-const NavLink = ({ to, children, mobile = false, isLogin = false, onClick }) => {
+const NavLink = ({ to, children, mobile = false, onClick }) => {
   const baseClasses = mobile
-    ? "text-white block px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-    : "text-white hover:text-gray-200 px-3 py-2 text-sm font-medium transition-colors duration-200 relative group";
-
-  const loginClasses = isLogin
-    ? mobile
-      ? "bg-[#E8EDF2] text-[#0D141C] block px-4 py-2 text-sm font-medium rounded-full hover:bg-white transition-colors duration-200 w-fit mx-3"
-      : "bg-[#E8EDF2] text-[#0D141C] px-4 py-1 rounded-3xl text-sm font-medium hover:bg-white hover:shadow-md transition-all duration-200 transform hover:scale-105"
-    : baseClasses;
+    ? "text-gray-200 hover:text-white block px-3 py-2 text-base hover:bg-transparent font-medium rounded-md transition-all duration-200 hover:bg-gray-800 relative group"
+    : "text-gray-200 hover:text-white px-3 py-2 text-sm hover:bg-transparent font-medium transition-all duration-200 relative group";
 
   return (
     <Link
       to={to}
-      className={loginClasses}
-      style={textStyles}
+      className={baseClasses}
       onClick={onClick}
     >
       {children}
-      {!mobile && !isLogin && (
-        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-200 group-hover:w-full"></span>
-      )}
+      <span className={`absolute ${mobile ? 'bottom-1' : 'bottom-0'} left-0 w-0 h-0.5 hover:bg-transparent bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 group-hover:w-full`}></span>
     </Link>
   );
 };

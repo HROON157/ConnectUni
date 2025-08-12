@@ -1,56 +1,78 @@
-import { sections, heroContent } from '../data/homeData'
-import { useNavigate } from 'react-router-dom'
+import { sections, heroContent } from "../data/homeData";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 const Home = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      <section className="px-4 sm:px-4 lg:px-4 py-5 lg:py-5">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-2xl lg:text-3xl font-bold text-[#0D141C] mb-6 leading-tight">
-              Welcome to <span className="text-[#1E90FF]">ConnectUni</span>
-            </h1>
-            <p className="text-lg sm:text-xl lg:text-1xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
-              {heroContent.description}
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      <section className="px-6 py-10 sm:px-8 lg:px-10">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight"
+          >
+            Welcome to{" "}
+            <span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
+              ConnectUni
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-6 text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+          >
+            {heroContent.description}
+          </motion.p>
         </div>
       </section>
 
-      {sections.map((section) => (
-        <section key={section.id} className={section.sectionClass}>
-          <div className="max-w-7xl mx-auto">
-            <div className={`grid grid-cols-1 lg:grid-cols-2 ${section.gap} items-center`}>
-              <div className="order-2 lg:order-1">
-                <div className="rounded-2xl overflow-hidden">
-                  <img
-                    src={section.image}
-                    alt={section.imageAlt}
-                    className="w-full h-64 object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-
-              <div className="order-1 lg:order-2">
-                <h2 className="text-1xl sm:text-2xl font-bold text-[#0D141C] mb-4">
-                  {section.title}
-                </h2>
-                <p className="text-lg text-[#4F7096] mb-6 leading-relaxed">
-                  {section.description}
-                </p>
-                <button 
-                  onClick={()=> navigate(section.buttonRoute)} 
-                  className="bg-[#1E90FF] text-white px-2 py-1 rounded-lg font-semibold cursor-pointer">
-                  {section.buttonText}
-                </button>
+      {sections.map((section, index) => (
+        <motion.section
+          key={section.id}
+          initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ staggerChildren: 0.2 }}
+          viewport={{ once: true }}
+          className="px-6 sm:px-8 lg:px-12 py-10"
+        >
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div className={index % 2 === 0 ? "order-1 lg:order-1" : "order-1 lg:order-2"}>
+              <div className="overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
+                <img
+                  src={section.image}
+                  alt={section.imageAlt}
+                  className="w-full h-72 object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             </div>
+
+            <div className={`order-1 lg:order-${index % 2 === 0 ? "2" : "1"}`}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                {section.title}
+              </h2>
+              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+                {section.description}
+              </p>
+              <button
+                onClick={() => navigate(section.buttonRoute)}
+                className="px-6 py-3 rounded-xl cursor-pointer font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md hover:shadow-lg hover:scale-105 transform transition-all duration-300"
+              >
+                {section.buttonText}
+              </button>
+            </div>
           </div>
-        </section>
+        </motion.section>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

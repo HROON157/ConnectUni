@@ -268,12 +268,56 @@ export const closeJobOpening = async (jobId) => {
 };
 
 
+// Add this new function for user-specific past job openings
+
+export const getPastJobOpeningsByUser = async (userId) => {
+  try {
+    console.log("Fetching past job openings for user:", userId);
+    const jobsCollection = collection(db, "jobOpenings");
+    
+    // Query for jobs posted by specific user that are closed
+    const q = query(
+      jobsCollection, 
+      where("postedBy", "==", userId),
+      where("status", "==", "closed"),
+      orderBy("closedAt", "desc")
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const jobs = [];
+    
+    querySnapshot.forEach((doc) => {
+      jobs.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    console.log(`Fetched ${jobs.length} past jobs for user ${userId}:`, jobs);
+    return jobs;
+  } catch (error) {
+    console.error("Error fetching user's past job openings:", error);
+    
+    // Fallback: get all closed jobs and filter client-side
+    try {
+      console.log("Falling back to client-side filtering...");
+      const allPastJobs = await getPastJobOpenings();
+      const userJobs = allPastJobs.filter(job => job.postedBy === userId);
+      console.log(`Fallback: Found ${userJobs.length} jobs for user ${userId}`);
+      return userJobs;
+    } catch (fallbackError) {
+      console.error("Fallback query also failed:", fallbackError);
+      throw fallbackError;
+    }
+  }
+};
+
+// Keep your existing getPastJobOpenings function for compatibility
 export const getPastJobOpenings = async () => {
   try {
     console.log("Fetching past job openings from Firebase...");
     const jobsCollection = collection(db, "jobOpenings");
     
-
     const q = query(
       jobsCollection, 
       where("status", "==", "closed"),
