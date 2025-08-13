@@ -10,7 +10,12 @@ import { getJobOpenings, closeJobOpening } from "../../Firebase/auth";
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from "../../Firebase/db";
 import { onAuthStateChanged } from 'firebase/auth';
-
+import QuickLogo from "../../assets/car.png"
+import AnalyticsLogo from "../../assets/analytics.png"
+import PastOpeningLogo from "../../assets/time-past.png";
+import AddOpeningLogo from "../../assets/plus.png";
+import BrowseUniLogo from "../../assets/education.png"
+import CurrentopningLogo from "../../assets/briefcase.png"
 const HR_Home = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -146,13 +151,22 @@ const HR_Home = () => {
         <div className="mb-10">
           <div className="flex items-center mb-8">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
-                <span className="text-white text-lg">📊</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md text-white">
+                <img
+                  src={AnalyticsLogo}
+                  alt="Analytics Overview"
+                  className="w-6 h-6 filter brightness-0 invert"
+                />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">Analytics Overview</h2>
+
+              <h2 className="text-2xl font-bold text-gray-800">
+                Analytics Overview
+              </h2>
             </div>
             <div className="ml-auto flex items-center space-x-2">
-              <span className="text-sm text-gray-500">Last updated: {new Date().toLocaleTimeString()}</span>
+              <span className="text-sm text-gray-500">
+                Last updated: {new Date().toLocaleTimeString()}
+              </span>
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
           </div>
@@ -184,26 +198,34 @@ const HR_Home = () => {
 
         {/* Quick Actions Section */}
         <div className="mb-10">
-          <div className="flex items-center mb-8">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                <span className="text-white text-lg">⚡</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800">Quick Actions</h2>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+              <img
+                src={QuickLogo}
+                alt="Quick Actions"
+                className="w-7 h-8 filter brightness-0 invert"
+              />
             </div>
+            <h2 className="text-2xl font-bold text-gray-800">Quick Actions</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
             <Link to="/past-openings" className="group">
               <div className="bg-white/90 backdrop-blur-2xl hover:bg-white transition-all duration-300 rounded-3xl shadow-lg hover:shadow-xl border border-blue-200/30 p-8 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
                 <div className="absolute -right-6 -top-6 w-20 h-20 bg-blue-500/5 rounded-full filter blur-lg"></div>
                 <div className="text-center relative z-10">
                   <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <span className="text-white text-3xl">📂</span>
+                    <img
+                      src={PastOpeningLogo}
+                      alt="Past Openings"
+                      className="w-7 h-7 filter brightness-0 invert"
+                    />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors">
                     Past Openings
                   </h3>
-                  <p className="text-gray-600 text-sm mt-2">View historical job postings</p>
+                  <p className="text-gray-600 text-sm mt-2">
+                    View historical job postings
+                  </p>
                 </div>
               </div>
             </Link>
@@ -213,12 +235,18 @@ const HR_Home = () => {
                 <div className="absolute -right-6 -top-6 w-20 h-20 bg-green-500/5 rounded-full filter blur-lg"></div>
                 <div className="text-center relative z-10">
                   <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <span className="text-white text-3xl">➕</span>
+                    <img
+                      src={AddOpeningLogo}
+                      alt="Past Openings"
+                      className="w-7 h-7 filter brightness-0 invert"
+                    />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 group-hover:text-green-700 transition-colors">
                     Add New Opening
                   </h3>
-                  <p className="text-gray-600 text-sm mt-2">Create new job posting</p>
+                  <p className="text-gray-600 text-sm mt-2">
+                    Create new job posting
+                  </p>
                 </div>
               </div>
             </Link>
@@ -228,12 +256,14 @@ const HR_Home = () => {
                 <div className="absolute -right-6 -top-6 w-20 h-20 bg-purple-500/5 rounded-full filter blur-lg"></div>
                 <div className="text-center relative z-10">
                   <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <span className="text-white text-3xl">🎓</span>
+                    <img src={BrowseUniLogo} alt="Browse Universities" className="w-9 h-9 filter brightness-0 invert" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 group-hover:text-purple-700 transition-colors">
                     Browse Universities
                   </h3>
-                  <p className="text-gray-600 text-sm mt-2">Explore partner institutions</p>
+                  <p className="text-gray-600 text-sm mt-2">
+                    Explore partner institutions
+                  </p>
                 </div>
               </div>
             </Link>
@@ -245,13 +275,16 @@ const HR_Home = () => {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-                <span className="text-white text-lg">💼</span>
+                <img src={CurrentopningLogo} alt="Current Openings" className="w-5 h-5 filter brightness-0 invert" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">Current Openings</h2>
+              <h2 className="text-2xl font-bold text-gray-800">
+                Current Openings
+              </h2>
             </div>
             {jobOpenings.length > 0 && (
               <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-md">
-                {jobOpenings.length} Active {jobOpenings.length === 1 ? 'Opening' : 'Openings'}
+                {jobOpenings.length} Active{" "}
+                {jobOpenings.length === 1 ? "Opening" : "Openings"}
               </span>
             )}
           </div>
@@ -277,14 +310,25 @@ const HR_Home = () => {
                               Active
                             </div>
                             <div className="text-gray-500 text-sm flex items-center">
-                              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                              <svg
+                                className="w-4 h-4 mr-1"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
-                              Posted: {job.createdAt
-                                ? new Date(job.createdAt.seconds * 1000).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
+                              Posted:{" "}
+                              {job.createdAt
+                                ? new Date(
+                                    job.createdAt.seconds * 1000
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
                                   })
                                 : "Unknown"}
                             </div>
@@ -298,28 +342,55 @@ const HR_Home = () => {
 
                       <div className="flex flex-wrap gap-4">
                         <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center">
-                          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <svg
+                            className="w-5 h-5 mr-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
                             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           View Applications
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleCloseJob(job.id)}
                           disabled={closingJob === job.id}
                           className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center"
                         >
                           {closingJob === job.id ? (
                             <>
-                              <svg className="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              <svg
+                                className="animate-spin w-5 h-5 mr-2"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
                               </svg>
                               Closing...
                             </>
                           ) : (
                             <>
-                              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                              <svg
+                                className="w-5 h-5 mr-2"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                               Close Opening
                             </>
@@ -327,21 +398,21 @@ const HR_Home = () => {
                         </button>
                       </div>
                     </div>
-                    
+
                     {/* Company Logo */}
                     <div className="flex-shrink-0 self-center lg:self-start">
                       <div className="w-44 h-44 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center shadow-lg border border-gray-200/50 overflow-hidden">
                         {hrProfile?.companyLogo ? (
-                          <img 
-                            src={hrProfile.companyLogo} 
-                            alt={hrProfile.company || "Company Logo"} 
+                          <img
+                            src={hrProfile.companyLogo}
+                            alt={hrProfile.company || "Company Logo"}
                             className="w-full h-full object-cover"
                             loading="lazy"
                           />
                         ) : (
                           <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
                             <span className="text-white text-3xl font-bold">
-                              {hrProfile?.company?.charAt(0) || 'C'}
+                              {hrProfile?.company?.charAt(0) || "C"}
                             </span>
                           </div>
                         )}
@@ -361,20 +432,29 @@ const HR_Home = () => {
                   <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/5 rounded-full filter blur-xl"></div>
                   <div className="relative z-10">
                     <div className="w-24 h-24 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-md">
-                      <span className="text-white text-4xl">💼</span>
+                      <img src={CurrentopningLogo} alt="Current Company Logo" className="w-12 h-12 object-cover" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">
                       No Job Openings Yet
                     </h3>
                     <p className="text-gray-600 mb-8 leading-relaxed">
-                      Start building your talent pipeline by creating your first job opening
+                      Start building your talent pipeline by creating your first
+                      job opening
                     </p>
                     <Link
                       to="/add-new-opening"
                       className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-2xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                     >
-                      <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      <svg
+                        className="w-6 h-6 mr-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       Create Your First Job Opening
                     </Link>

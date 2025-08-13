@@ -172,19 +172,7 @@ const Uni_Home = () => {
                 {universities.length} institutions
               </span>
             </div>
-            
-            {/* Filter Options */}
-            <div className="hidden md:flex items-center space-x-2">
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium shadow-md" style={{fontFamily:'Public Sans'}}>
-                All
-              </button>
-              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors" style={{fontFamily:'Public Sans'}}>
-                Private
-              </button>
-              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors" style={{fontFamily:'Public Sans'}}>
-                Public
-              </button>
-            </div>
+    
           </div>
         </div>
 

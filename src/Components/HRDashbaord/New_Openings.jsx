@@ -4,7 +4,18 @@ import { auth } from "../../Firebase/db";
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineBriefcase, HiOutlineDocumentText, HiOutlineMapPin, HiOutlineCurrencyDollar, HiOutlineClipboardDocumentList, HiOutlineSparkles, HiOutlineInformationCircle } from 'react-icons/hi2';
-
+import JobLogo from "../../assets/briefcase.png"
+import CalenderLogo from "../../assets/calendar.png";
+import TargetLogo from "../../assets/mission.png"
+import Location from "../../assets/location.png";
+import idea from "../../assets/idea.png";
+import updatedLogo from "../../assets/recycle.png";
+import justiceLog from "../../assets/justice.png"
+import clearDescriptionLogo from "../../assets/pen.png"
+import TransportCompensationLogo from "../../assets/profit.png"
+import educationLogo from "../../assets/education.png";
+import briefLogo from "../../assets/briefcase.png";
+import timePastLogo from "../../assets/time-past.png"
 const New_Openings = () => {
   const [formData, setFormData] = useState({
     jobTitle: "",
@@ -153,14 +164,14 @@ const New_Openings = () => {
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <HiOutlineBriefcase className="w-6 h-6 text-white" />
+              <img src={JobLogo} alt="Job Logo" className="w-7 h-7" />
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Public Sans" }}>
                 Create New Job Opening
               </h1>
               <p className="text-gray-600" style={{ fontFamily: "Public Sans" }}>
-                🎉 Ready to find amazing talent? Let's create your next job opportunity!
+                Ready to find amazing talent? Let's create your next job opportunity!
               </p>
             </div>
           </div>
@@ -182,7 +193,7 @@ const New_Openings = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center" style={{ fontFamily: "Public Sans" }}>
-                <HiOutlineDocumentText className="w-6 h-6 mr-2 text-purple-500" />
+                <HiOutlineDocumentText className="w-6 h-6 mr-2 text-black-500" />
                 Job Information
               </h2>
               
@@ -199,7 +210,7 @@ const New_Openings = () => {
                     value={formData.jobTitle}
                     onChange={handleInputChange}
                     placeholder="e.g. Software Engineer, Marketing Intern"
-                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                    className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
                       errors.jobTitle ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                     }`}
                     style={{ fontFamily: "Public Sans" }}
@@ -224,7 +235,7 @@ const New_Openings = () => {
                     onChange={handleInputChange}
                     placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
                     rows="4"
-                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
+                    className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent resize-none ${
                       errors.jobDescription ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                     }`}
                     style={{ fontFamily: "Public Sans" }}
@@ -248,7 +259,7 @@ const New_Openings = () => {
                       name="type"
                       value={formData.type}
                       onChange={handleInputChange}
-                      className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
                         errors.type ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                       }`}
                       style={{ fontFamily: "Public Sans" }}
@@ -277,7 +288,7 @@ const New_Openings = () => {
                       name="compensation"
                       value={formData.compensation}
                       onChange={handleInputChange}
-                      className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
                         errors.compensation ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                       }`}
                       style={{ fontFamily: "Public Sans" }}
@@ -308,7 +319,7 @@ const New_Openings = () => {
                     value={formData.payRange}
                     onChange={handleInputChange}
                     placeholder="e.g. $3000-5000/month, Rs. 50,000-80,000"
-                    className="w-full p-4 border border-gray-300 rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-400"
+                    className="w-full p-4 border border-gray-300 rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent hover:border-gray-400"
                     style={{ fontFamily: "Public Sans" }}
                   />
                 </div>
@@ -325,7 +336,7 @@ const New_Openings = () => {
                     value={formData.location}
                     onChange={handleInputChange}
                     placeholder="e.g. Lahore, Pakistan or Remote"
-                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                    className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
                       errors.location ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                     }`}
                     style={{ fontFamily: "Public Sans" }}
@@ -350,7 +361,7 @@ const New_Openings = () => {
                     onChange={handleInputChange}
                     placeholder="List the essential qualifications, skills, and experience needed for this role..."
                     rows="4"
-                    className={`w-full p-4 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
+                    className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent resize-none ${
                       errors.requirements ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                     }`}
                     style={{ fontFamily: "Public Sans" }}
@@ -382,7 +393,7 @@ const New_Openings = () => {
                       </>
                     ) : (
                       <>
-                        <HiOutlineSparkles className="w-5 h-5" />
+                        
                         <span>Create Job Opening</span>
                       </>
                     )}
@@ -396,49 +407,49 @@ const New_Openings = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sticky top-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center" style={{ fontFamily: "Public Sans" }}>
-                <HiOutlineInformationCircle className="w-5 h-5 mr-2 text-blue-500" />
+                <HiOutlineInformationCircle className="w-5 h-5 mr-2 text-black-500" />
                 Posting Guidelines
               </h3>
               
               <div className="space-y-4 text-sm text-gray-700">
                 {[
                   {
-                    icon: "✏️",
+                                    icon: <img src={clearDescriptionLogo} alt="Clear Description" className="w-5 h-5 mt-1" />,
                     title: "Clear & Descriptive",
                     desc: "Write clear job titles and detailed descriptions"
                   },
                   {
-                    icon: "🎯",
+                    icon: <img src={TargetLogo} alt="Target" className="w-5 h-5 mt-1" />,
                     title: "Specify Job Type",
                     desc: "Choose the correct category for your position"
                   },
                   {
-                    icon: "💰",
+                    icon: <img src={TransportCompensationLogo} alt="Transportation Logo" className="w-5 h-5 mt-1" />,
                     title: "Transparent Compensation",
                     desc: "Be clear about payment and benefits"
                   },
                   {
-                    icon: "📍",
+                    icon: <img src={Location} alt="Location" className="w-5 h-5 mt-1" />,
                     title: "Location Details",
                     desc: "Include specific location or remote options"
                   },
                   {
-                    icon: "📋",
+                    icon: <HiOutlineDocumentText className="w-5 h-5 mt-1" />,
                     title: "Essential Requirements",
                     desc: "List only necessary qualifications"
                   },
                   {
-                    icon: "📅",
+                    icon: <img src={CalenderLogo} alt="Calendar" className="w-5 h-5 mt-1" />,
                     title: "Application Process",
                     desc: "Provide clear application instructions"
                   },
                   {
-                    icon: "⚖️",
+                    icon: <img src={justiceLog} alt="Justice" className="w-5 h-5 mt-1" />,
                     title: "Equal Opportunity",
                     desc: "Follow non-discrimination guidelines"
                   },
                   {
-                    icon: "🔄",
+                    icon: <img src={updatedLogo} className="w-5 h-5 mt-1.5"/>,
                     title: "Keep Updated",
                     desc: "Remove postings when position is filled"
                   }
@@ -459,16 +470,17 @@ const New_Openings = () => {
 
               {/* Quick Tips */}
               <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                <h4 className="font-semibold text-blue-900 mb-2" style={{ fontFamily: "Public Sans" }}>
-                  💡 Pro Tips
-                </h4>
-                <ul className="text-xs text-blue-800 space-y-1" style={{ fontFamily: "Public Sans" }}>
-                  <li>• Use keywords students search for</li>
-                  <li>• Highlight growth opportunities</li>
-                  <li>• Mention company culture</li>
-                  <li>• Include application deadline</li>
-                </ul>
-              </div>
+  <h4 className="font-semibold text-blue-900 mb-2 flex items-center" style={{ fontFamily: "Public Sans" }}>
+    <img src={idea} alt="Pro Tips" className="w-4 h-4 mr-1 filter brightness-0" />
+    Pro Tips
+  </h4>
+  <ul className="text-xs text-blue-800 space-y-1" style={{ fontFamily: "Public Sans" }}>
+    <li>• Use keywords students search for</li>
+    <li>• Highlight growth opportunities</li>
+    <li>• Mention company culture</li>
+    <li>• Include application deadline</li>
+  </ul>
+</div>
             </div>
           </div>
         </div>

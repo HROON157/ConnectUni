@@ -1,14 +1,23 @@
 import BnuImage from "../../assets/BNU-Logo.png";
-
+import educationLogo from "../../assets/education.png";
+import { PiStudentLight } from "react-icons/pi";
+import calderLogo from "../../assets/calendar.png";
+import SearchLogo from "../../assets/search-interface-symbol.png";
+import MissionLogo from "../../assets/mission.png";
+import EducationLogo from "../../assets/mortarboard.png";
+import Location from "../../assets/location.png";
 const BNU_Profile = () => {
   const schools = [
     { code: "SCIT", name: "School of Computer Information Technology" },
     { code: "SE", name: "School of Education" },
     { code: "MDSVAD", name: "Mariam Dawood School of Visual Arts & Design" },
-    { code: "RHSA", name: "Razia Hassan School of Architecture" },    
+    { code: "RHSA", name: "Razia Hassan School of Architecture" },
     { code: "IP", name: "Institute of Psychology" },
-    { code: "SM-SLASS", name: "Seeta Majeed School of Liberal Arts & Social Sciences" },
-    { code: "SMS", name: "School of Management Sciences" }
+    {
+      code: "SM-SLASS",
+      name: "Seeta Majeed School of Liberal Arts & Social Sciences",
+    },
+    { code: "SMS", name: "School of Management Sciences" },
   ];
 
   return (
@@ -18,37 +27,51 @@ const BNU_Profile = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex flex-col md:flex-row items-start gap-6">
             <div className="relative">
-              <img 
-                src={BnuImage} 
-                alt="BNU Logo" 
-                className="w-32 h-32 rounded-2xl shadow-lg border-4 border-white" 
+              <img
+                src={BnuImage}
+                alt="BNU Logo"
+                className="w-32 h-32 rounded-2xl shadow-lg border-4 border-white"
               />
               <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
                 Liberal Arts
               </div>
             </div>
-            
+
             <div className="flex-1">
               <h1 className="text-4xl font-bold text-gray-900 mb-3 font-['Public_Sans']">
                 Beaconhouse National University
               </h1>
               <div className="space-y-2 mb-4">
-                <p className="text-blue-600 font-medium font-['Public_Sans']">
-                  📍 Tarogil, off Raiwind Road, Lahore
+                <p className="text-blue-600 font-medium font-['Public_Sans'] flex items-center gap-1">
+                  <img src={Location} alt="Location" className="w-4 h-4" />
+                  Tarogil, off Raiwind Road, Lahore
                 </p>
                 <div className="flex flex-wrap gap-4 text-sm">
-                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
-                    🎓 University
+                  <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold flex items-center gap-2 ">
+                    <img
+                      src={educationLogo}
+                      alt="Education"
+                      className="w-4 h-4"
+                    />
+                    University
+                  </div>
+
+                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <PiStudentLight className="w-5 h-5" />
+                    2,500-3,500 Students
                   </span>
-                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold">
-                    👥 2,500-3,500 Students
-                  </span>
-                  <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold">
-                    📅 Founded 2003
+
+                  <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <img
+                      src={calderLogo}
+                      alt="Founded"
+                      className="w-4 h-4 inline-block mr-1"
+                    />
+                    Founded 2003
                   </span>
                 </div>
               </div>
-              
+
               {/* Quick Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
@@ -88,36 +111,61 @@ const BNU_Profile = () => {
         <div className="grid gap-8">
           {/* Overview Section */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center">
-              📋 Overview
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center gap-1">
+              <img src={SearchLogo} alt="Overview" className="w-4 h-4" />
+              Overview
             </h2>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed font-['Public_Sans']">
-                BNU was established in 2003 and received its charter from the Government of Punjab in 2005. It is <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">Pakistan's first not‑for‑profit liberal arts university</span>, committed to inclusivity, academic freedom, and interdisciplinary education. The university offers programs in Visual Arts & Design, Architecture, Media & Communication, Liberal Arts & Social Sciences, Economics, Business, Computer Science, Education, Psychology, and Hospitality Management. BNU has disbursed over <span className="bg-green-100 text-green-800 px-2 py-1 rounded font-semibold">1 billion rupees in merit‑based scholarships</span>—serving nearly 40% of its student body—ensuring that financial constraints don't block access to higher education.
+                BNU was established in 2003 and received its charter from the
+                Government of Punjab in 2005. It is{" "}
+                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">
+                  Pakistan's first not‑for‑profit liberal arts university
+                </span>
+                , committed to inclusivity, academic freedom, and
+                interdisciplinary education. The university offers programs in
+                Visual Arts & Design, Architecture, Media & Communication,
+                Liberal Arts & Social Sciences, Economics, Business, Computer
+                Science, Education, Psychology, and Hospitality Management. BNU
+                has disbursed over{" "}
+                <span className="bg-green-100 text-green-800 px-2 py-1 rounded font-semibold">
+                  1 billion rupees in merit‑based scholarships
+                </span>
+                —serving nearly 40% of its student body—ensuring that financial
+                constraints don't block access to higher education.
               </p>
             </div>
           </div>
 
           {/* Mission Section */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center">
-              🎯 Mission
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center gap-1">
+              <img src={MissionLogo} alt="Mission" className="w-6 h-6" />
+              Mission
             </h2>
             <div className="border-l-4 border-blue-500 pl-6 bg-blue-50 p-6 rounded-r-lg">
               <p className="text-gray-700 leading-relaxed font-['Public_Sans'] text-lg">
-                To be globally recognized for academic excellence, offering a progressive, interdisciplinary liberal arts education, and fostering research that promotes responsible citizenry, cultural and socioeconomic change.
+                To be globally recognized for academic excellence, offering a
+                progressive, interdisciplinary liberal arts education, and
+                fostering research that promotes responsible citizenry, cultural
+                and socioeconomic change.
               </p>
             </div>
           </div>
 
           {/* Schools Section */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center">
-              🏫 Schools & Institutes
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center gap-2">
+              <img
+                src={EducationLogo}
+                alt="Schools & Institutes"
+                className="w-6 h-6"
+              />
+              Schools & Institutes
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {schools.map((school, index) => (
-                <div 
+                <div
                   key={index}
                   className="group border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-blue-500 transition-all duration-300 bg-gradient-to-r from-gray-50 to-white"
                 >
