@@ -3,6 +3,7 @@ import { addJobOpening } from "../../Firebase/auth";
 import { auth } from "../../Firebase/db";
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { HiOutlineBriefcase, HiOutlineDocumentText, HiOutlineMapPin, HiOutlineCurrencyDollar, HiOutlineClipboardDocumentList, HiOutlineSparkles, HiOutlineInformationCircle } from 'react-icons/hi2';
 import JobLogo from "../../assets/briefcase.png"
 import CalenderLogo from "../../assets/calendar.png";
@@ -157,27 +158,42 @@ const New_Openings = () => {
     }
   };
 
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 py-4 sm:py-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <img src={JobLogo} alt="Job Logo" className="w-7 h-7" />
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-4 lg:space-y-0">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <img src={JobLogo} alt="Job Logo" className="w-6 h-6 sm:w-7 sm:h-7" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2" style={{ fontFamily: "Public Sans" }}>
+                  Create New Job Opening
+                </h1>
+                <p className="text-sm sm:text-base text-gray-600" style={{ fontFamily: "Public Sans" }}>
+                  Ready to find amazing talent? Let's create your next job opportunity!
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Public Sans" }}>
-                Create New Job Opening
-              </h1>
-              <p className="text-gray-600" style={{ fontFamily: "Public Sans" }}>
-                Ready to find amazing talent? Let's create your next job opportunity!
-              </p>
-            </div>
+            <Link
+              to="/hr-dashboard"
+              className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base self-start lg:self-auto"
+              style={{ fontFamily: "Public Sans" }}
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 rotate-180" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
+              Back to Dashboard
+            </Link>
           </div>
-          
-          {/* Progress Indicator */}
-          <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-200 mb-6">
+
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 lg:gap-8">     
+             <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-200 mb-6">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600">Step 1 of 1</span>
               <span className="text-blue-600 font-semibold">Job Details</span>
@@ -259,16 +275,16 @@ const New_Openings = () => {
                       name="type"
                       value={formData.type}
                       onChange={handleInputChange}
-                      className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full p-2 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
                         errors.type ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                       }`}
                       style={{ fontFamily: "Public Sans" }}
                     >
                       <option value="">Select job type</option>
-                      <option value="internship">🎓 Internship</option>
-                      <option value="job">💼 Full-time Job</option>
-                      <option value="part-time">⏰ Part-time</option>
-                      <option value="other">🔧 Other</option>
+                      <option value="internship"> Internship</option>
+                      <option value="job">Full-time Job</option>
+                      <option value="part-time"> Part-time</option>
+                      <option value="other"> Other</option>
                     </select>
                     {errors.type && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -288,15 +304,15 @@ const New_Openings = () => {
                       name="compensation"
                       value={formData.compensation}
                       onChange={handleInputChange}
-                      className={`w-full p-4 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full p-2 border rounded-xl transition-all duration-200  focus:ring-purple-500 focus:border-transparent ${
                         errors.compensation ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                       }`}
                       style={{ fontFamily: "Public Sans" }}
                     >
                       <option value="">Select compensation</option>
-                      <option value="paid">💰 Paid</option>
-                      <option value="unpaid">🤝 Unpaid</option>
-                      <option value="stipend">💵 Stipend</option>
+                      <option value="paid">Paid</option>
+                      <option value="unpaid">Unpaid</option>
+                      <option value="stipend">Stipend</option>
                     </select>
                     {errors.compensation && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">

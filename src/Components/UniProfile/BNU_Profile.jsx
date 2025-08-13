@@ -179,7 +179,7 @@ const BNU_Profile = () => {
                       </p>
                     </div>
                     <div className="text-2xl opacity-50 group-hover:opacity-100 transition-opacity">
-                      🎨
+                      <img src={EducationLogo} alt="education logo" className="w-8 h-8" />
                     </div>
                   </div>
                 </div>

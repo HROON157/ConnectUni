@@ -317,7 +317,7 @@ const Login = () => {
               Join as Student
             </Link>
             <Link
-              to="/company-signup"
+              to="/hr-signup"
               className="flex-1 text-center py-2.5 px-4 bg-indigo-100 border border-indigo-200 text-indigo-700 hover:bg-indigo-200 rounded-lg font-medium transition-all duration-200 text-sm"
             >
               Join as HR

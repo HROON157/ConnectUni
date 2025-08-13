@@ -58,6 +58,10 @@ const HR_Profile = () => {
     about: ''
   })
 
+  // Validation states
+  const [validationErrors, setValidationErrors] = useState({})
+  const [showValidation, setShowValidation] = useState(false)
+
   const profilePicRef = useRef(null)
   const companyLogoRef = useRef(null)
   const [imageUploading, setImageUploading] = useState({
@@ -67,6 +71,118 @@ const HR_Profile = () => {
 
   // Debounce edit data to prevent excessive re-renders
   const debouncedEditData = useDebounce(editData, 300)
+
+
+
+  // Validation functions - ALL FIELDS COMPULSORY
+  const validateField = useCallback((name, value) => {
+    const errors = {}
+    
+    switch (name) {
+      case 'name':
+        if (!value || !value.trim()) {
+          errors.name = 'Name is required'
+        } else if (value.trim().length < 2) {
+          errors.name = 'Name must be at least 2 characters'
+        } else if (value.trim().length > 50) {
+          errors.name = 'Name must be less than 50 characters'
+        } else if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+          errors.name = 'Name can only contain letters and spaces'
+        }
+        break
+        
+      case 'title':
+        if (!value || !value.trim()) {
+          errors.title = 'Job title is required'
+        } else if (value.trim().length < 2) {
+          errors.title = 'Job title must be at least 2 characters'
+        } else if (value.trim().length > 100) {
+          errors.title = 'Job title must be less than 100 characters'
+        }
+        break
+        
+      case 'company':
+        if (!value || !value.trim()) {
+          errors.company = 'Company name is required'
+        } else if (value.trim().length < 2) {
+          errors.company = 'Company name must be at least 2 characters'
+        } else if (value.trim().length > 100) {
+          errors.company = 'Company name must be less than 100 characters'
+        }
+        break
+        
+      case 'linkedin':
+        // LinkedIn is now COMPULSORY
+        if (!value || !value.trim()) {
+          errors.linkedin = 'LinkedIn profile is required'
+        } else {
+          const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/
+          const urlRegex = /^https?:\/\/.+/
+          
+          if (!urlRegex.test(value.trim()) && !linkedinRegex.test(`https://www.${value.trim()}`)) {
+            errors.linkedin = 'Please enter a valid LinkedIn URL'
+          }
+        }
+        break
+        
+      case 'period':
+        if (!value || !value.trim()) {
+          errors.period = 'Work period is required'
+        } else if (value.trim().length < 5) {
+          errors.period = 'Please enter a valid work period'
+        } else if (value.trim().length > 50) {
+          errors.period = 'Work period must be less than 50 characters'
+        }
+        break
+        
+      case 'about':
+        if (!value || !value.trim()) {
+          errors.about = 'About section is required'
+        } else if (value.trim().length < 10) {
+          errors.about = 'About section must be at least 10 characters'
+        } else if (value.trim().length > 500) {
+          errors.about = 'About section must be less than 500 characters'
+        }
+        break
+        
+      case 'profilePic':
+        // Profile picture is now COMPULSORY
+        if (!value || value === 'loading') {
+          errors.profilePic = 'Profile picture is required'
+        }
+        break
+        
+      case 'companyLogo':
+        // Company logo is now COMPULSORY
+        if (!value || value === 'loading') {
+          errors.companyLogo = 'Company logo is required'
+        }
+        break
+    }
+    
+    return errors
+  }, [])
+
+  const validateAllFields = useCallback((data) => {
+    let allErrors = {}
+    
+    // ALL fields are now required for validation
+    const fieldsToValidate = ['name', 'title', 'company', 'linkedin', 'period', 'about', 'profilePic', 'companyLogo']
+    
+    fieldsToValidate.forEach(field => {
+      const fieldErrors = validateField(field, data[field])
+      allErrors = { ...allErrors, ...fieldErrors }
+    })
+    
+    return allErrors
+  }, [validateField])
+
+  // Check if form is valid
+  const isFormValid = useMemo(() => {
+    const errors = validateAllFields(editData)
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }, [editData, validateAllFields])
 
   // Memoized functions for better performance
   const clearUserData = useCallback(() => {
@@ -84,11 +200,21 @@ const HR_Profile = () => {
     setEditData(defaultData)
     setIsEditing(false)
     setImageUploading({ profilePic: false, companyLogo: false })
+    setValidationErrors({})
+    setShowValidation(false)
   }, [])
 
   // Optimized image compression with WebP support and progressive quality reduction
   const compressImage = useCallback(async (file, maxSizeKB = 100) => {
     return new Promise((resolve, reject) => {
+      // Enhanced image validation
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please select a valid image file (JPEG, PNG, or WebP)')
+        reject(new Error('Invalid file type'))
+        return
+      }
+
       // Check if file is too large before processing
       if (file.size > 10 * 1024 * 1024) {
         toast.error('File must be smaller than 10MB')
@@ -96,13 +222,18 @@ const HR_Profile = () => {
         return
       }
 
-      const reader = new FileReader()
-      
-      reader.onload = (event) => {
-        const img = new Image()
-        img.src = event.target.result
+      // Check minimum dimensions
+      const img = new Image()
+      img.onload = () => {
+        if (img.width < 100 || img.height < 100) {
+          toast.error('Image must be at least 100x100 pixels')
+          reject(new Error('Image too small'))
+          return
+        }
+
+        const reader = new FileReader()
         
-        img.onload = () => {
+        reader.onload = (event) => {
           const canvas = document.createElement("canvas")
           let { width, height } = img
           
@@ -151,18 +282,19 @@ const HR_Profile = () => {
           resolve(base64)
         }
         
-        img.onerror = () => {
-          toast.error('Failed to process image. Please try a different file.')
-          reject(new Error('Image processing failed'))
+        reader.onerror = () => {
+          reject(new Error('File read failed'))
         }
+        
+        reader.readAsDataURL(file)
       }
-      
-      reader.onerror = () => {
-        toast.error('Failed to read file. Please try again.')
-        reject(new Error('File read failed'))
+
+      img.onerror = () => {
+        toast.error('Invalid image file. Please try a different file.')
+        reject(new Error('Image processing failed'))
       }
-      
-      reader.readAsDataURL(file)
+
+      img.src = URL.createObjectURL(file)
     })
   }, [])
 
@@ -219,7 +351,7 @@ const HR_Profile = () => {
             ...defaultData,
             name: hrData.profileName || hrData.email || '',
             company: hrData.companyName || 'Edit your company name',
-            linkedin: hrData.linkedin || 'Edit your LinkedIn URL',
+            linkedin: hrData.linkedin || '',
             title: 'HR Professional'
           }
         }
@@ -259,6 +391,8 @@ const HR_Profile = () => {
 
   const handleEditProfile = useCallback(() => {
     setIsEditing(true)
+    setShowValidation(false)
+    setValidationErrors({})
   }, [])
 
   const handleSave = useCallback(async () => {
@@ -269,9 +403,15 @@ const HR_Profile = () => {
       return
     }
 
-    // Validate required fields
-    if (!debouncedEditData.name?.trim()) {
-      toast.error('Name is required')
+    // Show validation errors
+    setShowValidation(true)
+
+    // Validate all fields
+    const errors = validateAllFields(editData)
+    
+    if (Object.keys(errors).length > 0) {
+      toast.error('Please fix all validation errors before saving')
+      setValidationErrors(errors)
       return
     }
 
@@ -280,10 +420,13 @@ const HR_Profile = () => {
       toast.info('Saving profile...', { autoClose: 1000 })
       
       const updatedData = { 
-        ...debouncedEditData,
-        name: debouncedEditData.name.trim(),
-        title: debouncedEditData.title || 'HR Professional',
-        company: debouncedEditData.company || 'Company Name',
+        ...editData,
+        name: editData.name.trim(),
+        title: editData.title.trim() || 'HR Professional',
+        company: editData.company.trim() || 'Company Name',
+        linkedin: editData.linkedin.trim(),
+        period: editData.period.trim(),
+        about: editData.about.trim(),
         updatedAt: new Date(),
         lastModified: Date.now(),
         userId: uid
@@ -294,8 +437,10 @@ const HR_Profile = () => {
 
       setProfileData(updatedData)
       setIsEditing(false)
+      setShowValidation(false)
+      setValidationErrors({})
       
-      toast.success('Profile saved successfully! ')
+      toast.success('Profile saved successfully!')
     } catch (error) {
       console.error('Error saving profile:', error)
       
@@ -313,30 +458,33 @@ const HR_Profile = () => {
     } finally {
       setLoading(false)
     }
-  }, [user?.uid, debouncedEditData])
+  }, [user?.uid, editData, validateAllFields])
 
   const handleCancel = useCallback(() => {
     setEditData(profileData)
     setIsEditing(false)
     setImageUploading({ profilePic: false, companyLogo: false })
+    setValidationErrors({})
+    setShowValidation(false)
     toast.info('Changes cancelled')
   }, [profileData])
+
+  const handleInputChange = useCallback((field, value) => {
+    setEditData(prev => ({ ...prev, [field]: value }))
+    
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
+  }, [validationErrors])
 
   const handleFileUpload = useCallback(async (event, type) => {
     const file = event.target.files[0]
     if (!file) return
-
-    // Enhanced file validation
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      toast.error('Please select a valid image file (JPEG, PNG, or WebP)')
-      return
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB')
-      return
-    }
 
     try {
       setImageUploading(prev => ({ ...prev, [type]: true }))
@@ -346,16 +494,25 @@ const HR_Profile = () => {
  
       setEditData(prev => ({ ...prev, [type]: compressedBase64 }))
       
+      // Clear validation error for this field
+      if (validationErrors[type]) {
+        setValidationErrors(prev => {
+          const newErrors = { ...prev }
+          delete newErrors[type]
+          return newErrors
+        })
+      }
+      
       toast.success(`${type === 'profilePic' ? 'Profile picture' : 'Company logo'} uploaded successfully!`)
     } catch (error) {
       console.error('Error processing image:', error)
-      toast.error('Failed to process image. Please try a different file.')
+      
       
       setEditData(prev => ({ ...prev, [type]: profileData[type] }))
     } finally {
       setImageUploading(prev => ({ ...prev, [type]: false }))
     }
-  }, [compressImage, profileData])
+  }, [compressImage, profileData, validationErrors])
 
   // Memoized initials calculation
   const getInitials = useCallback((name) => {
@@ -397,6 +554,13 @@ const HR_Profile = () => {
       </div>
     </div>
   ), [])
+
+  // Validation helper component
+  const ValidationError = ({ error }) => (
+    error && showValidation ? (
+      <p className="text-red-500 text-xs mt-1">{error}</p>
+    ) : null
+  )
 
   // Early returns for loading states
   if (!authChecked) {
@@ -528,7 +692,9 @@ const HR_Profile = () => {
                   <div className="mb-6 text-center">
                     <div className="relative inline-block">
                       <div 
-                        className="w-20 h-20 rounded-full cursor-pointer border-4 border-gray-200 shadow-lg overflow-hidden bg-gray-200 flex items-center justify-center mx-auto hover:border-indigo-400 transition-colors duration-300"
+                        className={`w-20 h-20 rounded-full cursor-pointer border-4 shadow-lg overflow-hidden bg-gray-200 flex items-center justify-center mx-auto hover:border-indigo-400 transition-colors duration-300 ${
+                          validationErrors.profilePic && showValidation ? 'border-red-400' : 'border-gray-200'
+                        }`}
                         onClick={() => profilePicRef.current?.click()}
                       >
                         {imageUploading.profilePic ? (
@@ -553,8 +719,11 @@ const HR_Profile = () => {
                         </div>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-2">Click to upload profile picture</p>
-                    <p className="text-xs text-gray-400">Max 5MB, supports JPEG, PNG, WebP</p>
+                          <p className="text-sm text-gray-500 mt-2">Click to upload profile picture</p>
+                    <p className="text-xs text-gray-400">
+                      Max 5MB, supports JPEG, PNG, WebP <span className="text-red-500">(required)</span>
+                    </p>
+                    <ValidationError error={validationErrors.profilePic} />
                     <input
                       type="file"
                       ref={profilePicRef}
@@ -566,6 +735,7 @@ const HR_Profile = () => {
 
                   {/* Form Fields */}
                   <div className="space-y-4 mb-6">
+                    {/* Name Field */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Name <span className="text-red-500">*</span>
@@ -573,77 +743,127 @@ const HR_Profile = () => {
                       <input
                         type="text"
                         value={editData.name || ''}
-                        onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg  focus:ring-indigo-100 focus:border-indigo-400 transition-colors"
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-100 focus:border-indigo-400 transition-colors ${
+                          validationErrors.name && showValidation ? 'border-red-500' : 'border-gray-300'
+                        }`}
                         placeholder="Enter your name"
                         required
                       />
+                      <ValidationError error={validationErrors.name} />
                     </div>
                     
+                    {/* Job Title Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Job Title <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="text"
                         value={editData.title || ''}
-                        onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-100 focus:border-indigo-400 transition-colors"
+                        onChange={(e) => handleInputChange('title', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-100 focus:border-indigo-400 transition-colors ${
+                          validationErrors.title && showValidation ? 'border-red-500' : 'border-gray-300'
+                        }`}
                         placeholder="Enter your job title"
+                        required
                       />
+                      <ValidationError error={validationErrors.title} />
                     </div>
-                    
+
+                    {/* Company Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Company <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="text"
                         value={editData.company || ''}
-                        onChange={(e) => setEditData(prev => ({ ...prev, company: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors"
+                        onChange={(e) => handleInputChange('company', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors ${
+                          validationErrors.company && showValidation ? 'border-red-500' : 'border-gray-300'
+                        }`}
                         placeholder="Enter company name"
+                        required
                       />
+                      <ValidationError error={validationErrors.company} />
                     </div>
 
+                    {/* LinkedIn Field */}
+
+
+                    {/* LinkedIn Field - NOW REQUIRED */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        LinkedIn Profile <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="url"
                         value={editData.linkedin || ''}
-                        onChange={(e) => setEditData(prev => ({ ...prev, linkedin: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg  focus:ring-indigo-200 focus:border-indigo-500 transition-colors"
+                        onChange={(e) => handleInputChange('linkedin', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors ${
+                          validationErrors.linkedin && showValidation ? 'border-red-500' : 'border-gray-300'
+                        }`}
                         placeholder="https://linkedin.com/in/yourprofile"
+                        required
                       />
+                      <ValidationError error={validationErrors.linkedin} />
                     </div>
                     
+                    {/* Work Period Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Work Period</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Work Period <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="text"
                         value={editData.period || ''}
-                        onChange={(e) => setEditData(prev => ({ ...prev, period: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg transition-colors"
+                        onChange={(e) => handleInputChange('period', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg transition-colors ${
+                          validationErrors.period && showValidation ? 'border-red-500' : 'border-gray-300'
+                        }`}
                         placeholder="e.g., May 2023 - Present"
+                        required
                       />
+                      <ValidationError error={validationErrors.period} />
                     </div>
 
+                    {/* About Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">About</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        About <span className="text-red-500">*</span>
+                      </label>
                       <textarea
                         value={editData.about || ''}
-                        onChange={(e) => setEditData(prev => ({ ...prev, about: e.target.value }))}
+                        onChange={(e) => handleInputChange('about', e.target.value)}
                         rows={4}
                         maxLength={500}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors resize-none"
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors resize-none ${
+                          validationErrors.about && showValidation ? 'border-red-500' : 'border-gray-300'
+                        }`}
                         placeholder="Tell us about yourself..."
+                        required
                       />
-                      <p className="text-xs text-gray-400 mt-1">
-                        {editData.about?.length || 0}/500 characters
-                      </p>
+                      <div className="flex justify-between items-center mt-1">
+                        <ValidationError error={validationErrors.about} />
+                        <p className="text-xs text-gray-400">
+                          {editData.about?.length || 0}/500 characters
+                        </p>
+                      </div>
                     </div>
 
                     {/* Company Logo Upload */}
+  
+
+                    {/* Company Logo Upload - NOW REQUIRED */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Company Logo</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Company Logo <span className="text-red-500">*</span>
+                      </label>
                       <div 
-                        className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 hover:bg-gray-50 hover:border-indigo-400 transition-colors duration-300"
+                        className={`w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer border-2 border-dashed hover:bg-gray-50 hover:border-indigo-400 transition-colors duration-300 ${
+                          validationErrors.companyLogo && showValidation ? 'border-red-400' : 'border-gray-300'
+                        }`}
                         onClick={() => companyLogoRef.current?.click()}
                       >
                         {imageUploading.companyLogo ? (
@@ -660,7 +880,10 @@ const HR_Profile = () => {
                           <span className="text-xs text-gray-500">Upload Logo</span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">Click to upload company logo</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Click to upload company logo <span className="text-red-500">(required)</span>
+                      </p>
+                      <ValidationError error={validationErrors.companyLogo} />
                       <input
                         type="file"
                         ref={companyLogoRef}
@@ -671,12 +894,28 @@ const HR_Profile = () => {
                     </div>
                   </div>
 
+                  {/* Validation Summary */}
+                  {showValidation && Object.keys(validationErrors).length > 0 && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-red-600 text-sm font-medium mb-2">Please fix the following errors:</p>
+                      <ul className="text-red-600 text-xs space-y-1">
+                        {Object.entries(validationErrors).map(([field, error]) => (
+                          <li key={field}>• {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   {/* Action Buttons */}
                   <div className="flex gap-3">
                     <button
                       onClick={handleSave}
-                      disabled={loading || imageUploading.profilePic || imageUploading.companyLogo}
-                      className="flex-1 bg-indigo-600 cursor-pointer  text-white py-2 rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                      disabled={loading || imageUploading.profilePic || imageUploading.companyLogo || !isFormValid}
+                      className={`flex-1 py-2 rounded-xl font-medium transition-colors duration-300 shadow-md hover:shadow-lg ${
+                        (loading || imageUploading.profilePic || imageUploading.companyLogo || !isFormValid)
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer'
+                      }`}
                     >
                       {loading ? (
                         <div className="flex items-center justify-center gap-2">
@@ -693,6 +932,15 @@ const HR_Profile = () => {
                       Cancel
                     </button>
                   </div>
+
+                  {/* Form Status */}
+                                    {!isFormValid && (
+                    <div className="mt-3 text-center">
+                      <p className="text-xs text-gray-500">
+                        Complete all required fields including profile picture and company logo to save
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -700,7 +948,19 @@ const HR_Profile = () => {
         </div>
       </div>
 
-      
+      {/* Back to Dashboard Button - Fixed Position */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <Link
+          to="/hr-dashboard"
+          className="inline-flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm"
+        >
+          <svg className="w-4 h-4 mr-2 rotate-180" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          </svg>
+          Back to Dashboard
+        </Link>
+      </div>
+
       <ToastContainer {...toastConfig} />
     </>
   )

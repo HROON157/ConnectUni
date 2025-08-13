@@ -17,7 +17,6 @@ import UMT_Profile from './Components/UniProfile/UMT_Profile'
 import PastOpening from './Components/HRDashbaord/PastOpening'
 import HR_Profile from './Components/HRDashbaord/HR_Profile'
 import { AuthProvider } from './Context/Context'
-
 function App() {
   return (
     <AuthProvider>

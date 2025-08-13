@@ -7,15 +7,15 @@ import {
 } from "../Charts/PieChartCard";
 import { Link } from "react-router-dom";
 import { getJobOpenings, closeJobOpening } from "../../Firebase/auth";
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../Firebase/db";
-import { onAuthStateChanged } from 'firebase/auth';
-import QuickLogo from "../../assets/car.png"
-import AnalyticsLogo from "../../assets/analytics.png"
+import { onAuthStateChanged } from "firebase/auth";
+import QuickLogo from "../../assets/car.png";
+import AnalyticsLogo from "../../assets/analytics.png";
 import PastOpeningLogo from "../../assets/time-past.png";
 import AddOpeningLogo from "../../assets/plus.png";
-import BrowseUniLogo from "../../assets/education.png"
-import CurrentopningLogo from "../../assets/briefcase.png"
+import BrowseUniLogo from "../../assets/education.png";
+import CurrentopningLogo from "../../assets/briefcase.png";
 const HR_Home = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,22 +26,22 @@ const HR_Home = () => {
 
   const fetchHRProfile = async () => {
     try {
-      const uid = user?.uid || localStorage.getItem('uid');
-      if (!uid || uid === 'null' || uid === 'undefined') return;
+      const uid = user?.uid || localStorage.getItem("uid");
+      if (!uid || uid === "null" || uid === "undefined") return;
 
-      const docRef = doc(db, 'hrProfiles', uid);
+      const docRef = doc(db, "hrProfiles", uid);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         setHrProfile(docSnap.data());
       }
     } catch (error) {
-      console.error('Error fetching HR profile:', error);
+      console.error("Error fetching HR profile:", error);
     }
   };
 
   const getDisplayName = () => {
-    return hrProfile?.name || localStorage.getItem('userName') || 'HR User';
+    return hrProfile?.name || localStorage.getItem("userName") || "HR User";
   };
 
   useEffect(() => {
@@ -50,8 +50,8 @@ const HR_Home = () => {
       if (currentUser) {
         fetchHRProfile();
       } else {
-        const storedUID = localStorage.getItem('uid');
-        if (storedUID && storedUID !== 'null' && storedUID !== 'undefined') {
+        const storedUID = localStorage.getItem("uid");
+        if (storedUID && storedUID !== "null" && storedUID !== "undefined") {
           setUser({ uid: storedUID });
         }
       }
@@ -120,7 +120,9 @@ const HR_Home = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-gray-200/30 p-8 flex flex-col items-center space-y-4">
           <div className="w-14 h-14 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-700 font-medium text-lg">Loading your dashboard...</p>
+          <p className="text-gray-700 font-medium text-lg">
+            Loading your dashboard...
+          </p>
           <div className="w-full bg-gray-200 rounded-full h-1.5">
             <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-1.5 rounded-full animate-pulse w-3/4"></div>
           </div>
@@ -256,7 +258,11 @@ const HR_Home = () => {
                 <div className="absolute -right-6 -top-6 w-20 h-20 bg-purple-500/5 rounded-full filter blur-lg"></div>
                 <div className="text-center relative z-10">
                   <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <img src={BrowseUniLogo} alt="Browse Universities" className="w-9 h-9 filter brightness-0 invert" />
+                    <img
+                      src={BrowseUniLogo}
+                      alt="Browse Universities"
+                      className="w-9 h-9 filter brightness-0 invert"
+                    />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 group-hover:text-purple-700 transition-colors">
                     Browse Universities
@@ -275,7 +281,11 @@ const HR_Home = () => {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-                <img src={CurrentopningLogo} alt="Current Openings" className="w-5 h-5 filter brightness-0 invert" />
+                <img
+                  src={CurrentopningLogo}
+                  alt="Current Openings"
+                  className="w-5 h-5 filter brightness-0 invert"
+                />
               </div>
               <h2 className="text-2xl font-bold text-gray-800">
                 Current Openings
@@ -431,8 +441,12 @@ const HR_Home = () => {
                 <div className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-xl border border-gray-200/30 p-12 max-w-md mx-auto relative overflow-hidden">
                   <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/5 rounded-full filter blur-xl"></div>
                   <div className="relative z-10">
-                    <div className="w-24 h-24 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-md">
-                      <img src={CurrentopningLogo} alt="Current Company Logo" className="w-12 h-12 object-cover" />
+                    <div className="w-24 h-24 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-8 shadow-md">
+                      <img
+                        src={CurrentopningLogo}
+                        alt="Current Company Logo"
+                        className="w-12 h-12 object-cover filter brightness-0 invert"
+                      />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">
                       No Job Openings Yet
