@@ -1,5 +1,10 @@
 import UMTLogo from "../../assets/UMT-Logo.png";
-
+import educationLogo from "../../assets/education.png"
+import calenderLogo from "../../assets/calendar.png";
+import { PiStudentLight } from "react-icons/pi";
+import SearchLogo from "../../assets/search-interface-symbol.png";
+import MissionLogo from "../../assets/mission.png";
+import Location from "../../assets/location.png";
 const UMT_Profile = () => {
   const schools = [
     { code: "SST", name: "School of Science & Technology" },
@@ -25,37 +30,51 @@ const UMT_Profile = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex flex-col md:flex-row items-start gap-6">
             <div className="relative">
-              <img 
-                src={UMTLogo} 
-                alt="UMT Logo" 
-                className="w-32 h-32 rounded-2xl shadow-lg border-4 border-white" 
+              <img
+                src={UMTLogo}
+                alt="UMT Logo"
+                className="w-32 h-32 rounded-2xl shadow-lg border-4 border-white"
               />
               <div className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
                 W4 Rank
               </div>
             </div>
-            
+
             <div className="flex-1">
               <h1 className="text-4xl font-bold text-gray-900 mb-3 font-['Public_Sans']">
                 University of Management and Technology
               </h1>
               <div className="space-y-2 mb-4">
-                <p className="text-blue-600 font-medium font-['Public_Sans']">
-                  📍 C-II Block C 2 Phase 1 Johar Town, Lahore, 54770
+                <p className="text-blue-600 font-medium font-['Public_Sans'] flex items-center gap-1">
+                  <img src={Location} alt="Location" className="w-4 h-4" />
+                  C-II Block C 2 Phase 1 Johar Town, Lahore, 54770
                 </p>
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
-                    🎓 University
-                  </span>
-                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold">
-                    👥 25,000 Students
-                  </span>
-                  <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold">
-                    📅 Founded 1990
-                  </span>
-                </div>
+                 <div className="flex flex-wrap gap-4 text-sm">
+                                  <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold flex items-center gap-2 ">
+                                    <img
+                                      src={educationLogo}
+                                      alt="Education"
+                                      className="w-4 h-4"
+                                    />
+                                    University
+                                  </div>
+                
+                                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                                    <PiStudentLight className="w-5 h-5" />
+                                    2,500-3,500 Students
+                                  </span>
+                
+                                  <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                                    <img
+                                      src={calenderLogo}
+                                      alt="Founded"
+                                      className="w-4 h-4 inline-block mr-1"
+                                    />
+                                    Founded 2003
+                                  </span>
+                                </div>
               </div>
-              
+
               {/* Quick Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
@@ -95,32 +114,54 @@ const UMT_Profile = () => {
         <div className="grid gap-8">
           {/* Overview Section */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center">
-              📋 Overview
+    <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center gap-1">
+              <img src={SearchLogo} alt="Overview" className="w-4 h-4" />
+              Overview
             </h2>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed font-['Public_Sans']">
-                UMT began as the Institute of Leadership and Management (ILM) Trust in 1990 and evolved into the Institute of Management and Technology (IMT) in 2002. It was granted full university status in June 2004, becoming UMT. It is recognized by the Higher Education Commission of Pakistan as a <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-semibold">W4‑category university (the highest rank)</span> UMT serves over 10,000 students from across Pakistan and globally, supported by 700+ faculty (165+ PhDs), and boasts 13 schools and 4 institutes offering 150+ programs across various disciplines.
+                UMT began as the Institute of Leadership and Management (ILM)
+                Trust in 1990 and evolved into the Institute of Management and
+                Technology (IMT) in 2002. It was granted full university status
+                in June 2004, becoming UMT. It is recognized by the Higher
+                Education Commission of Pakistan as a{" "}
+                <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-semibold">
+                  W4‑category university (the highest rank)
+                </span>{" "}
+                UMT serves over 10,000 students from across Pakistan and
+                globally, supported by 700+ faculty (165+ PhDs), and boasts 13
+                schools and 4 institutes offering 150+ programs across various
+                disciplines.
               </p>
             </div>
           </div>
 
           {/* Mission Section */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center">
-              🎯 Mission
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center gap-1">
+              <img src={MissionLogo} alt="Mission" className="w-6 h-6" />
+              Mission
             </h2>
             <div className="space-y-4">
               <div className="border-l-4 border-blue-500 pl-6">
-                <h3 className="font-bold text-lg text-gray-900 mb-2">Learning</h3>
+                <h3 className="font-bold text-lg text-gray-900 mb-2">
+                  Learning
+                </h3>
                 <p className="text-gray-700 leading-relaxed font-['Public_Sans']">
-                  Designed to inspire stakeholders and foster discovery of human potential at the highest levels of efficiency, excellence, equity, trusteeship, and sustainability.
+                  Designed to inspire stakeholders and foster discovery of human
+                  potential at the highest levels of efficiency, excellence,
+                  equity, trusteeship, and sustainability.
                 </p>
               </div>
               <div className="border-l-4 border-green-500 pl-6">
-                <h3 className="font-bold text-lg text-gray-900 mb-2">Leading</h3>
+                <h3 className="font-bold text-lg text-gray-900 mb-2">
+                  Leading
+                </h3>
                 <p className="text-gray-700 leading-relaxed font-['Public_Sans']">
-                  To become a leading learning institution that supports integrated societal development via strategic partnerships, leadership generation, knowledge creation, enduring values, and sustainable practices and technologies.
+                  To become a leading learning institution that supports
+                  integrated societal development via strategic partnerships,
+                  leadership generation, knowledge creation, enduring values,
+                  and sustainable practices and technologies.
                 </p>
               </div>
             </div>
@@ -128,12 +169,17 @@ const UMT_Profile = () => {
 
           {/* Schools Section */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center">
-              🏫 Schools & Institutes
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 font-['Public_Sans'] flex items-center gap-2">
+               <img
+                 src={educationLogo}
+                 alt="Schools & Institutes"
+                 className="w-6 h-6"
+               />
+               Schools & Institutes
+             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {schools.map((school, index) => (
-                <div 
+                <div
                   key={index}
                   className="group border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-blue-500 transition-all duration-300 bg-gradient-to-r from-gray-50 to-white"
                 >
@@ -147,7 +193,7 @@ const UMT_Profile = () => {
                       </p>
                     </div>
                     <div className="text-2xl opacity-50 group-hover:opacity-100 transition-opacity">
-                      🎓
+                      <img src={educationLogo} alt="education logo" className="w-8 h-8" />
                     </div>
                   </div>
                 </div>
