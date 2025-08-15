@@ -5,9 +5,8 @@ export const publicNavItems = [
 
 export const studentNavItems = [
   // { path: "/student-dashboard", label: "Dashboard" },
-  { path: "/jobs", label: "Jobs" },
-  { path: "/internships", label: "Internships" },
-  { path: "/profile", label: "Profile" }
+  // { path: "/jobs", label: "Jobs" },
+  // { path: "/internships", label: "Internships" },
 ];
 
 export const hrNavItems = [

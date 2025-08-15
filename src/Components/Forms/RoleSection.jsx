@@ -63,6 +63,10 @@ const CombinedSignup = ({ userRole = "student" }) => {
       toast.error("Please fill in all required fields");
       return;
     }
+    if(formData.role === "student" && formData.hodReferralCode !== "HS-1221") {
+      toast.error("Please enter the correct HOD referral code");
+      return;
+    }
 
     const loadingToastId = toast.loading("Creating your account...");
 

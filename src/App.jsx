@@ -16,6 +16,7 @@ import BNU_Profile from './Components/UniProfile/BNU_Profile'
 import UMT_Profile from './Components/UniProfile/UMT_Profile'
 import PastOpening from './Components/HRDashbaord/PastOpening'
 import HR_Profile from './Components/HRDashbaord/HR_Profile'
+import Student_Profile from './Components/StudentDashboard/Student_Profile'
 import { AuthProvider } from './Context/Context'
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             <Route path='/umt-profile' element={<UMT_Profile />} />
             <Route path='/past-openings' element={<PastOpening />} />
             <Route path='/hr-profile' element={<HR_Profile />} />
+            <Route path='/student-profile' element={<Student_Profile />} />
           </Routes>
         </div>
       </Router>

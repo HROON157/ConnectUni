@@ -186,12 +186,14 @@ export const addJobOpening = async (jobData) => {
 };
 
 
-export const createJobOpening = async (jobData) => {
+export const createJobOpening = async (jobData, userId) => {
   try {
     const jobsCollection = collection(db, "jobOpenings");
     
     const jobDoc = {
       ...jobData,
+      postedBy: userId, // This will filter jobs by HR user
+      postedByEmail: auth.currentUser?.email,
       isActive: true,      
       status: "active",   
       createdAt: serverTimestamp(),
@@ -205,34 +207,45 @@ export const createJobOpening = async (jobData) => {
     throw error;
   }
 };
-export const getJobOpenings = async () => {
+
+// Update the existing getJobOpenings function
+export const getJobOpenings = async (userId = null) => {
   try {
     console.log("Fetching job openings from Firebase...");
     const jobsCollection = collection(db, "jobOpenings");
-    const querySnapshot = await getDocs(jobsCollection);
-    console.log("Total documents in collection:", querySnapshot.size);
+    
+    let q;
+    if (userId) {
+      // Filter by specific user
+      q = query(
+        jobsCollection,
+        where("postedBy", "==", userId),
+        where("status", "==", "active")
+      );
+    } else {
+      // Get all active jobs (for admin/general view)
+      q = query(
+        jobsCollection,
+        where("status", "==", "active")
+      );
+    }
+    
+    const querySnapshot = await getDocs(q);
+    console.log("Total documents found:", querySnapshot.size);
     
     const jobs = [];
     
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       console.log("Document data:", doc.id, data);
-      const isJobActive = 
-        data.isActive === true || 
-        (data.isActive === undefined && data.status === 'active') ||
-        (data.isActive === undefined && data.status !== 'closed');
       
-      console.log("Job", doc.id, "- isActive:", data.isActive, "status:", data.status, "considered active:", isJobActive);
-      
-      if (isJobActive) {
-        jobs.push({
-          id: doc.id,
-          ...data
-        });
-      }
+      jobs.push({
+        id: doc.id,
+        ...data
+      });
     });
     
-
+    // Sort by creation date
     jobs.sort((a, b) => {
       if (a.createdAt && b.createdAt) {
         return b.createdAt.seconds - a.createdAt.seconds;
@@ -240,7 +253,7 @@ export const getJobOpenings = async () => {
       return 0;
     });
     
-    console.log("Final active jobs:", jobs);
+    console.log("Final jobs for user:", jobs);
     return jobs;
   } catch (error) {
     console.error("Error fetching job openings:", error);
