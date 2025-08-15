@@ -1,8 +1,9 @@
+import Student_Home from "./Student_Home";
 const Std_Dashboard = () => {
-  const userName = localStorage.getItem('userName');  
+   
   return (
     <div>
-      <p>Hello, {userName}</p>
+      <Student_Home />
     </div>
   )
 }

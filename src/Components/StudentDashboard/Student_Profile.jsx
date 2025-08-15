@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import EducationLogo from "../../assets/education.png"
 // Custom hook for debouncing
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -32,29 +32,35 @@ const toastConfig = {
   theme: "light",
 };
 
-const HR_Profile = () => {
+const Student_Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "",
-    title: "Edit your job title",
-    company: "Edit your company name",
+    title: "Edit your title",
+    bio:"Enter your career objective",
+    university: "Edit your university",
+    degreeProgram: "Edit your degree program",
+    timePeriod: "Edit your time period",
     profilePic: null,
-    companyLogo: null,
+    resume: null,
     linkedin: "",
-    period: "May 2023 - Present",
+    github: "",
     about: "Edit your about.",
   });
   const [editData, setEditData] = useState({
     name: "",
+    bio:"",
     title: "",
-    company: "",
+    university: "",
+    degreeProgram: "",
+    timePeriod: "",
     profilePic: null,
-    companyLogo: null,
+    resume: null,
     linkedin: "",
-    period: "",
+    github: "",
     about: "",
   });
 
@@ -63,10 +69,10 @@ const HR_Profile = () => {
   const [showValidation, setShowValidation] = useState(false);
 
   const profilePicRef = useRef(null);
-  const companyLogoRef = useRef(null);
-  const [imageUploading, setImageUploading] = useState({
+  const resumeRef = useRef(null);
+  const [uploading, setUploading] = useState({
     profilePic: false,
-    companyLogo: false,
+    resume: false,
   });
 
   // Debounce edit data to prevent excessive re-renders
@@ -86,54 +92,93 @@ const HR_Profile = () => {
           errors.name = "Name must be less than 50 characters";
         }
         break;
-
+      case "timePeriod":
+        if (!value || !value.trim()) {
+          errors.timePeriod = "Time period is required";
+        } else if (value.trim().length < 2) {
+          errors.timePeriod = "Time period must be at least 2 characters";
+        } else if (value.trim().length > 100) {
+          errors.timePeriod = "Time period must be less than 100 characters";
+        }
+        break;
       case "title":
         if (!value || !value.trim()) {
-          errors.title = "Job title is required";
+          errors.title = "Title is required";
         } else if (value.trim().length < 2) {
-          errors.title = "Job title must be at least 2 characters";
+          errors.title = "Title must be at least 2 characters";
         } else if (value.trim().length > 100) {
-          errors.title = "Job title must be less than 100 characters";
+          errors.title = "Title must be less than 100 characters";
+        }
+        break;
+        case "bio":
+            if(!value || !value.trim()) {
+                errors.bio = "Bio is required";
+            }
+            else if (value.trim().length < 10) {
+                errors.bio = "Bio must be at least 10 characters";
+            }
+            else if (value.trim().length > 200) {
+                errors.bio = "Bio must be less than 200 characters";
+            }
+            break;
+        case "university":
+        if (!value || !value.trim()) {
+          errors.university = "University is required";
+        } else if (value.trim().length < 2) {
+          errors.university = "University name must be at least 2 characters";
+        } else if (value.trim().length > 100) {
+          errors.university =
+            "University name must be less than 100 characters";
         }
         break;
 
-      case "company":
+      case "degreeProgram":
         if (!value || !value.trim()) {
-          errors.company = "Company name is required";
+          errors.degreeProgram = "Degree program is required";
         } else if (value.trim().length < 2) {
-          errors.company = "Company name must be at least 2 characters";
+          errors.degreeProgram = "Degree program must be at least 2 characters";
         } else if (value.trim().length > 100) {
-          errors.company = "Company name must be less than 100 characters";
+          errors.degreeProgram =
+            "Degree program must be less than 100 characters";
         }
         break;
+
       case "linkedin":
-        // LinkedIn is now COMPULSORY but accepts any LinkedIn URL
         if (!value || !value.trim()) {
           errors.linkedin = "LinkedIn profile is required";
         } else {
-          const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/.+/;
-          const urlRegex = /^https?:\/\/.+/;
+          const trimmedValue = value.trim();
 
-          // Check if it's a valid URL format or contains linkedin.com
-          const isValidUrl = urlRegex.test(value.trim());
-          const isLinkedInDomain =
-            linkedinRegex.test(value.trim()) ||
-            linkedinRegex.test(`https://www.${value.trim()}`);
+          const isLinkedInUrl = trimmedValue
+            .toLowerCase()
+            .includes("linkedin.com");
+          const hasValidFormat =
+            trimmedValue.startsWith("http://") ||
+            trimmedValue.startsWith("https://") ||
+            trimmedValue.includes("linkedin.com");
 
-          if (!isValidUrl && !isLinkedInDomain) {
-            errors.linkedin = "Please enter a valid LinkedIn URL";
-          } else if (!value.trim().toLowerCase().includes("linkedin.com")) {
+          if (!isLinkedInUrl) {
             errors.linkedin = "Please enter a LinkedIn URL";
           }
         }
         break;
-      case "period":
+
+      case "github":
         if (!value || !value.trim()) {
-          errors.period = "Work period is required";
-        } else if (value.trim().length < 5) {
-          errors.period = "Please enter a valid work period";
-        } else if (value.trim().length > 50) {
-          errors.period = "Work period must be less than 50 characters";
+          errors.github = "GitHub profile is required";
+        } else {
+          const trimmedValue = value.trim();
+
+          const isGitHubUrl = trimmedValue.toLowerCase().includes("github.com");
+          const hasValidFormat =
+            trimmedValue.startsWith("http://") ||
+            trimmedValue.startsWith("https://") ||
+            trimmedValue.includes("github.com");
+
+          if (!isGitHubUrl) {
+            errors.github = "Please enter a GitHub URL";
+          }
+          // Remove the complex regex validation that was causing issues
         }
         break;
 
@@ -146,8 +191,8 @@ const HR_Profile = () => {
           errors.about = "About section must be less than 500 characters";
         }
         break;
+
       case "profilePic":
-        // Profile picture is now COMPULSORY
         if (!value || value === "loading" || value === null || value === "") {
           errors.profilePic = "Profile picture is required";
         } else if (
@@ -160,17 +205,16 @@ const HR_Profile = () => {
         }
         break;
 
-      case "companyLogo":
-        // Company logo is now COMPULSORY
+      case "resume":
         if (!value || value === "loading" || value === null || value === "") {
-          errors.companyLogo = "Company logo is required";
+          errors.resume = "Resume is required";
         } else if (
           typeof value === "string" &&
-          value.startsWith("data:image/")
+          value.startsWith("data:application/pdf")
         ) {
-          // Valid base64 image
+          // Valid base64 PDF
         } else {
-          errors.companyLogo = "Invalid company logo format";
+          errors.resume = "Invalid resume format (PDF only)";
         }
         break;
     }
@@ -182,16 +226,18 @@ const HR_Profile = () => {
     (data) => {
       let allErrors = {};
 
-      // ALL fields are now required for validation
       const fieldsToValidate = [
         "name",
+        "bio",
         "title",
-        "company",
+        "university",
+        "degreeProgram",
+        "timePeriod",
         "linkedin",
-        "period",
+        "github",
         "about",
         "profilePic",
-        "companyLogo",
+        "resume",
       ];
 
       fieldsToValidate.forEach((field) => {
@@ -204,18 +250,9 @@ const HR_Profile = () => {
     [validateField]
   );
 
-  // ...existing code...
-
-  // Temporary debug - add this before the isFormValid check
-  console.log("Current editData:", editData);
-  console.log("Profile pic type:", typeof editData.profilePic);
-  console.log("Company logo type:", typeof editData.companyLogo);
-  console.log("Validation errors:", validateAllFields(editData));
-
-  // Check if form is valid - FIXED VERSION
+  // Check if form is valid
   const isFormValid = useMemo(() => {
     const errors = validateAllFields(editData);
-    console.log("Form validation errors:", errors);
     return Object.keys(errors).length === 0;
   }, [editData, validateAllFields]);
 
@@ -225,30 +262,60 @@ const HR_Profile = () => {
     setValidationErrors(errors);
   }, [editData, validateAllFields]);
 
-  // Memoized functions for better performance
+  // Clear user data function
   const clearUserData = useCallback(() => {
     const defaultData = {
       name: "",
-      title: "Edit your job title",
-      company: "Edit your company name",
+      bio: "Edit your bio",
+      title: "Edit your title",
+      university: "Edit your university",
+      degreeProgram: "Edit your degree program",
+      timePeriod: "Edit your time period",
       profilePic: null,
-      companyLogo: null,
+      resume: null,
       linkedin: "",
-      period: "May 2023 - Present",
-      about: "Enter your about.",
+      github: "",
+      about: "Edit your about.",
     };
     setProfileData(defaultData);
     setEditData(defaultData);
     setIsEditing(false);
-    setImageUploading({ profilePic: false, companyLogo: false });
+    setUploading({ profilePic: false, resume: false });
     setValidationErrors({});
     setShowValidation(false);
   }, []);
 
-  // Optimized image compression with WebP support and progressive quality reduction
+  const downloadResume = useCallback(() => {
+    if (!profileData.resume) {
+      toast.error("No resume available to download");
+      return;
+    }
+
+    try {
+      // Create a blob from the base64 data
+      const base64Response = fetch(profileData.resume);
+      base64Response
+        .then((res) => res.blob())
+        .then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `${profileData.name || "student"}_resume.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        //   toast.success("Resume downloaded successfully!");
+        });
+    } catch (error) {
+      console.error("Error downloading resume:", error);
+      toast.error("Failed to download resume");
+    }
+  }, [profileData.resume, profileData.name]);
+
+  // Image compression function
   const compressImage = useCallback(async (file, maxSizeKB = 100) => {
     return new Promise((resolve, reject) => {
-      // Enhanced image validation
       const allowedTypes = [
         "image/jpeg",
         "image/jpg",
@@ -261,14 +328,12 @@ const HR_Profile = () => {
         return;
       }
 
-      // Check if file is too large before processing
       if (file.size > 10 * 1024 * 1024) {
         toast.error("File must be smaller than 10MB");
         reject(new Error("File too large"));
         return;
       }
 
-      // Check minimum dimensions
       const img = new Image();
       img.onload = () => {
         if (img.width < 100 || img.height < 100) {
@@ -278,12 +343,10 @@ const HR_Profile = () => {
         }
 
         const reader = new FileReader();
-
         reader.onload = (event) => {
           const canvas = document.createElement("canvas");
           let { width, height } = img;
 
-          // Progressive resizing based on original size
           const maxDimension = width > height ? width : height;
           if (maxDimension > 1200) {
             const ratio = 1200 / maxDimension;
@@ -295,18 +358,14 @@ const HR_Profile = () => {
           canvas.height = height;
 
           const ctx = canvas.getContext("2d");
-
-          // Enable image smoothing for better quality
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Try WebP first, fallback to JPEG
           let format = "image/webp";
           let quality = 0.85;
           let base64 = canvas.toDataURL(format, quality);
 
-          // If WebP not supported or file still too large, use JPEG
           if (
             !base64.startsWith("data:image/webp") ||
             base64.length / 1024 > maxSizeKB
@@ -315,21 +374,10 @@ const HR_Profile = () => {
             quality = 0.8;
             base64 = canvas.toDataURL(format, quality);
 
-            // Progressive quality reduction
             while (base64.length / 1024 > maxSizeKB && quality > 0.3) {
               quality -= 0.05;
               base64 = canvas.toDataURL(format, quality);
             }
-          }
-
-          // Final size check
-          const finalSizeKB = base64.length / 1024;
-          if (finalSizeKB > maxSizeKB * 1.5) {
-            toast.warn(
-              `Image compressed to ${Math.round(
-                finalSizeKB
-              )}KB. Consider using a smaller image for better performance.`
-            );
           }
 
           resolve(base64);
@@ -351,10 +399,37 @@ const HR_Profile = () => {
     });
   }, []);
 
-  // Memoized auth effect
+  // PDF compression function
+  const processPDF = useCallback(async (file) => {
+    return new Promise((resolve, reject) => {
+      if (file.type !== "application/pdf") {
+        toast.error("Please select a PDF file");
+        reject(new Error("Invalid file type"));
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Resume must be smaller than 5MB");
+        reject(new Error("File too large"));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+
+      reader.onerror = () => {
+        reject(new Error("File read failed"));
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  // Auth effect
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("Auth state changed:", currentUser?.uid);
       clearUserData();
       setUser(currentUser);
       setAuthChecked(true);
@@ -374,7 +449,7 @@ const HR_Profile = () => {
     try {
       setLoading(true);
 
-      const docRef = doc(db, "hrProfiles", uid);
+      const docRef = doc(db, "studentProfiles", uid);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -383,31 +458,41 @@ const HR_Profile = () => {
         setEditData(data);
         toast.success("Profile loaded successfully", { autoClose: 1500 });
       } else {
-        // Try hr_users collection as fallback
-        const hrUserRef = doc(db, "hr_users", uid);
-        const hrUserSnap = await getDoc(hrUserRef);
+        // Try students collection as fallback
+        const studentRef = doc(db, "students", uid);
+        const studentSnap = await getDoc(studentRef);
 
         let defaultData = {
           name: "",
-          title: "Edit your job title",
-          company: "Edit your company name",
+          bio: "Edit your bio",
+          title: "Edit your title",
+          university: "Edit your university",
+          degreeProgram: "Edit your degree program",
+          timePeriod: "Edit your time period",
           profilePic: null,
-          companyLogo: null,
+          resume: null,
           linkedin: "",
-          period: "May 2023 - Present",
+          github: "",
           about: "Edit your about.",
         };
 
-        if (hrUserSnap.exists()) {
-          const hrData = hrUserSnap.data();
+        if (studentSnap.exists()) {
+          const studentData = studentSnap.data();
           defaultData = {
             ...defaultData,
-            name: hrData.profileName || hrData.email || "",
-            company: hrData.companyName || "Edit your company name",
-            linkedin: hrData.linkedin || "",
-            title: "HR Professional",
+            name: studentData.profileName || studentData.email || "",
+            bio: studentData.bio || "Edit your bio",
+            university: studentData.university || "Edit your university",
+            degreeProgram:
+              studentData.degreeProgram || "Edit your degree program",
+            timePeriod: "2021 - Present",
+            title: "Student",
           };
         }
+
+        console.log("Current editData:", editData);
+        console.log("Validation errors:", validateAllFields(editData));
+        console.log("Is form valid:", isFormValid);
 
         setProfileData(defaultData);
         setEditData(defaultData);
@@ -415,24 +500,18 @@ const HR_Profile = () => {
       }
     } catch (error) {
       console.error("Error loading profile:", error);
+      toast.error("Failed to load profile. Please refresh the page.");
 
-      if (error.code === "permission-denied") {
-        toast.error("Permission denied. Please check your authentication.");
-      } else if (error.code === "unavailable") {
-        toast.error("Service temporarily unavailable. Please try again.");
-      } else {
-        toast.error("Failed to load profile. Please refresh the page.");
-      }
-
-      // Set minimal default data on error
       const defaultData = {
-        name: "HR User",
-        title: "Edit your job title",
-        company: "Edit your company name",
+        name: "Student",
+        bio: "Edit your bio",
+        title: "Edit your title",
+        university: "Edit your university",
+        degreeProgram: "Edit your degree program",
         profilePic: null,
-        companyLogo: null,
+        resume: null,
         linkedin: "",
-        period: "May 2023 - Present",
+        github: "",
         about: "Edit your about.",
       };
       setProfileData(defaultData);
@@ -446,6 +525,9 @@ const HR_Profile = () => {
     setIsEditing(true);
     setShowValidation(false);
     setValidationErrors({});
+    console.log("Current editData:", editData);
+    console.log("Validation errors:", validateAllFields(editData));
+    console.log("Is form valid:", isFormValid);
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -456,10 +538,8 @@ const HR_Profile = () => {
       return;
     }
 
-    // Show validation errors
     setShowValidation(true);
 
-    // Validate all fields
     const errors = validateAllFields(editData);
 
     if (Object.keys(errors).length > 0) {
@@ -475,17 +555,20 @@ const HR_Profile = () => {
       const updatedData = {
         ...editData,
         name: editData.name.trim(),
-        title: editData.title.trim() || "HR Professional",
-        company: editData.company.trim() || "Company Name",
+        bio: editData.bio.trim(),
+        title: editData.title.trim(),
+        university: editData.university.trim(),
+        degreeProgram: editData.degreeProgram.trim(),
+        timePeriod: editData.timePeriod.trim(),
         linkedin: editData.linkedin.trim(),
-        period: editData.period.trim(),
+        github: editData.github.trim(),
         about: editData.about.trim(),
         updatedAt: new Date(),
         lastModified: Date.now(),
         userId: uid,
       };
 
-      const docRef = doc(db, "hrProfiles", uid);
+      const docRef = doc(db, "studentProfiles", uid);
       await setDoc(docRef, updatedData, { merge: true });
 
       setProfileData(updatedData);
@@ -496,18 +579,7 @@ const HR_Profile = () => {
       toast.success("Profile saved successfully!");
     } catch (error) {
       console.error("Error saving profile:", error);
-
-      if (error.code === "permission-denied") {
-        toast.error("Permission denied. Please check your authentication.");
-      } else if (error.code === "unauthenticated") {
-        toast.error("Session expired. Please log in again.");
-      } else if (error.message?.includes("document too large")) {
-        toast.error("Profile data too large. Please use smaller images.");
-      } else if (error.code === "unavailable") {
-        toast.error("Service temporarily unavailable. Please try again.");
-      } else {
-        toast.error("Failed to save profile. Please try again.");
-      }
+      toast.error("Failed to save profile. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -516,7 +588,7 @@ const HR_Profile = () => {
   const handleCancel = useCallback(() => {
     setEditData(profileData);
     setIsEditing(false);
-    setImageUploading({ profilePic: false, companyLogo: false });
+    setUploading({ profilePic: false, resume: false });
     setValidationErrors({});
     setShowValidation(false);
     toast.info("Changes cancelled");
@@ -526,7 +598,6 @@ const HR_Profile = () => {
     (field, value) => {
       setEditData((prev) => ({ ...prev, [field]: value }));
 
-      // Clear validation error for this field when user starts typing
       if (validationErrors[field]) {
         setValidationErrors((prev) => {
           const newErrors = { ...prev };
@@ -544,17 +615,18 @@ const HR_Profile = () => {
       if (!file) return;
 
       try {
-        setImageUploading((prev) => ({ ...prev, [type]: true }));
+        setUploading((prev) => ({ ...prev, [type]: true }));
         setEditData((prev) => ({ ...prev, [type]: "loading" }));
 
-        const compressedBase64 = await compressImage(
-          file,
-          type === "profilePic" ? 150 : 100
-        );
+        let processedFile;
+        if (type === "profilePic") {
+          processedFile = await compressImage(file, 150);
+        } else if (type === "resume") {
+          processedFile = await processPDF(file);
+        }
 
-        setEditData((prev) => ({ ...prev, [type]: compressedBase64 }));
+        setEditData((prev) => ({ ...prev, [type]: processedFile }));
 
-        // Clear validation error for this field
         if (validationErrors[type]) {
           setValidationErrors((prev) => {
             const newErrors = { ...prev };
@@ -565,23 +637,21 @@ const HR_Profile = () => {
 
         toast.success(
           `${
-            type === "profilePic" ? "Profile picture" : "Company logo"
+            type === "profilePic" ? "Profile picture" : "Resume"
           } uploaded successfully!`
         );
       } catch (error) {
-        console.error("Error processing image:", error);
-
+        console.error("Error processing file:", error);
         setEditData((prev) => ({ ...prev, [type]: profileData[type] }));
       } finally {
-        setImageUploading((prev) => ({ ...prev, [type]: false }));
+        setUploading((prev) => ({ ...prev, [type]: false }));
       }
     },
-    [compressImage, profileData, validationErrors]
+    [compressImage, processPDF, profileData, validationErrors]
   );
 
-  // Memoized initials calculation
   const getInitials = useCallback((name) => {
-    if (!name) return "HR";
+    if (!name) return "ST";
     return name
       .split(" ")
       .filter((n) => n.length > 0)
@@ -591,47 +661,6 @@ const HR_Profile = () => {
       .slice(0, 2);
   }, []);
 
-  // Memoized components for better performance
-  const LoadingSpinner = useMemo(
-    () => (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">
-            {loading && isEditing ? "Saving profile..." : "Loading profile..."}
-          </p>
-        </div>
-      </div>
-    ),
-    [loading, isEditing]
-  );
-
-  const AuthRequiredMessage = useMemo(
-    () => (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-        <div className="text-center bg-white p-8 rounded-2xl shadow-lg backdrop-blur-sm bg-opacity-90 max-w-md w-full">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">
-            Authentication Required
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Please log in to access your profile.
-          </p>
-          <button
-            onClick={() => {
-              localStorage.clear();
-              window.location.href = "/login";
-            }}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 shadow-md"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    ),
-    []
-  );
-
-  // Validation helper component
   const ValidationError = ({ error }) =>
     error && showValidation ? (
       <p className="text-red-500 text-xs mt-1">{error}</p>
@@ -652,11 +681,38 @@ const HR_Profile = () => {
   }
 
   if (!user?.uid) {
-    return AuthRequiredMessage;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+        <div className="text-center bg-white p-8 rounded-2xl shadow-lg backdrop-blur-sm bg-opacity-90 max-w-md w-full">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            Authentication Required
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Please log in to access your profile.
+          </p>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/login";
+            }}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 shadow-md"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (loading && !isEditing) {
-    return LoadingSpinner;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading profile...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -684,17 +740,19 @@ const HR_Profile = () => {
                   </div>
                 </div>
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                  {profileData.name || "HR User"}
+                  {profileData.name || "Student"}
                 </h1>
                 <p className="text-gray-900 text-sm mb-1">
                   {profileData.title}
                 </p>
-                <p className="text-gray-900 text-sm">{profileData.company}</p>
+                <p className="text-gray-900 text-sm">
+                  {profileData.bio}  
+                </p>
               </div>
             </div>
 
             {/* Edit Profile Button */}
-            <div className="px-8 py-4 ">
+            <div className="px-8 py-4">
               <button
                 onClick={handleEditProfile}
                 className="w-full cursor-pointer bg-gradient-to-br from-blue-500 to-indigo-600 text-white py-1 rounded-2xl font-medium hover:bg-indigo-700 transition-colors duration-300 shadow-md hover:shadow-lg"
@@ -713,68 +771,138 @@ const HR_Profile = () => {
               </p>
             </div>
 
-            {/* Company Section */}
+            {/* Education Section */}
             <div className="px-6 py-4 border-t border-gray-200/50">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                Company
+                Education
               </h2>
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center shadow-sm">
-                  {profileData.companyLogo ? (
-                    <img
-                      src={profileData.companyLogo}
-                      alt="Company Logo"
-                      className="w-full h-full object-cover rounded-lg"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 bg-indigo-200 rounded"></div>
-                  )}
+                <div className="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center shadow-sm">
+                  <img src={EducationLogo} alt="Education" className="w-8 h-8" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800">
-                    {profileData.company}
-                  </h3>
-                  <p className="text-sm text-gray-600">{profileData.title}</p>
-                  <p className="text-sm text-gray-500">{profileData.period}</p>
+                  <p className="text-sm text-gray-600">
+                    {profileData.degreeProgram}
+                  </p>
+                  <p className="text-sm text-gray-500">{profileData.title}</p>
+                  <p className="text-sm text-gray-500">
+                    {profileData.timePeriod}
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="spcace p-2">
-                {profileData.linkedin && (
-                  <Link
-                    to={
-                      profileData.linkedin.startsWith("http")
-                        ? profileData.linkedin
-                        : `https://${profileData.linkedin}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block w-full"
-                  >
-                    <div className="flex items-center gap-3 p-3 rounded-xl  border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all duration-300 group">
-                      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                        <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
-                          LinkedIn Profile
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          View professional profile
-                        </p>
-                      </div>
-                      <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </div>
-                    </div>
-                  </Link>
-                )}
-                </div>
+
+            {/* Links Section */}
+
+{/* Links Section */}
+<div className="px-6 py-4 border-t border-gray-200/50 mb-4">
+  <h2 className="text-lg font-semibold text-gray-800 mb-3">
+    Social Links
+  </h2>
+  <div className="space-y-3">
+    {profileData.linkedin && (
+      <Link
+        to={
+          profileData.linkedin.startsWith("http")
+            ? profileData.linkedin
+            : `https://${profileData.linkedin}`
+        }
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block w-full"
+      >
+        <div className="flex items-center gap-3 p-3 rounded-xl  border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all duration-300 group">
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+              LinkedIn Profile
+            </h3>
+            <p className="text-sm text-gray-500">
+              View professional profile
+            </p>
+          </div>
+          <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </div>
+        </div>
+      </Link>
+    )}
+
+    {profileData.github && (
+      <Link
+        to={
+          profileData.github.startsWith("http")
+            ? profileData.github
+            : `https://${profileData.github}`
+        }
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block w-full"
+      >
+        <div className="flex items-center gap-3 p-3 rounded-xl  border border-gray-200 hover:border-gray-700 hover:shadow-md transition-all duration-300 group">
+          <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-800 group-hover:text-gray-700 transition-colors">
+              GitHub Profile
+            </h3>
+            <p className="text-sm text-gray-500">
+              View code repositories
+            </p>
+          </div>
+          <div className="text-gray-400 group-hover:text-gray-600 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </div>
+        </div>
+      </Link>
+    )}
+      <h2 className="text-lg font-semibold text-gray-800 mb-3">
+    Social Links
+  </h2>
+    {profileData.resume && (
+      <button
+        onClick={downloadResume}
+        className="w-full text-left"
+      >
+        <div className="flex items-center gap-3 p-3 rounded-xl  border border-gray-200 hover:border-red-500 hover:shadow-md transition-all duration-300 group cursor-pointer">
+          <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3 3h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l3-3z"/>
+              <path d="M14 8v8"/>
+              <path d="M10 12l4-4 4 4"/>
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-800 group-hover:text-red-600 transition-colors">
+              Download Resume
+            </h3>
+            <p className="text-sm text-gray-500">
+              PDF format, ready to view
+            </p>
+          </div>
+          <div className="text-gray-400 group-hover:text-red-500 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+        </div>
+      </button>
+    )}
+  </div>
+</div>
+
+
           </div>
 
           {/* Edit Modal */}
@@ -806,7 +934,7 @@ const HR_Profile = () => {
                         }`}
                         onClick={() => profilePicRef.current?.click()}
                       >
-                        {imageUploading.profilePic ? (
+                        {uploading.profilePic ? (
                           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
                         ) : editData.profilePic &&
                           editData.profilePic !== "loading" ? (
@@ -819,7 +947,7 @@ const HR_Profile = () => {
                           <div className="animate-pulse bg-gray-300 w-full h-full"></div>
                         ) : (
                           <div className="text-xl font-bold text-gray-600">
-                            {getInitials(editData.name || "HR")}
+                            {getInitials(editData.name || "ST")}
                           </div>
                         )}
                       </div>
@@ -870,10 +998,10 @@ const HR_Profile = () => {
                       <ValidationError error={validationErrors.name} />
                     </div>
 
-                    {/* Job Title Field */}
+                    {/* Title Field */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Job Title <span className="text-red-500">*</span>
+                        Title <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -886,37 +1014,98 @@ const HR_Profile = () => {
                             ? "border-red-500"
                             : "border-gray-300"
                         }`}
-                        placeholder="Enter your job title"
+                        placeholder="e.g., Computer Science Student"
                         required
                       />
                       <ValidationError error={validationErrors.title} />
                     </div>
 
-                    {/* Company Field */}
-                    <div>
+                                        <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Company <span className="text-red-500">*</span>
+                        Bio <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        value={editData.company || ""}
+                        value={editData.bio || ""}
                         onChange={(e) =>
-                          handleInputChange("company", e.target.value)
+                          handleInputChange("bio", e.target.value)
                         }
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors ${
-                          validationErrors.company && showValidation
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-100 focus:border-indigo-400 transition-colors ${
+                          validationErrors.bio && showValidation
                             ? "border-red-500"
                             : "border-gray-300"
                         }`}
-                        placeholder="Enter company name"
+                        placeholder="e.g., Computer Science Student"
                         required
                       />
-                      <ValidationError error={validationErrors.company} />
+                      <ValidationError error={validationErrors.bio} />
+                    </div>
+
+                    {/* University Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        University <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editData.university || ""}
+                        onChange={(e) =>
+                          handleInputChange("university", e.target.value)
+                        }
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors ${
+                          validationErrors.university && showValidation
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                        placeholder="Enter university name"
+                        required
+                      />
+                      <ValidationError error={validationErrors.university} />
+                    </div>
+
+                    {/* Degree Program Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Degree Program <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editData.degreeProgram || ""}
+                        onChange={(e) =>
+                          handleInputChange("degreeProgram", e.target.value)
+                        }
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors ${
+                          validationErrors.degreeProgram && showValidation
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                        placeholder="e.g., Bachelor of Computer Science"
+                        required
+                      />
+                      <ValidationError error={validationErrors.degreeProgram} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Time Period <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editData.timePeriod || ""}
+                        onChange={(e) =>
+                          handleInputChange("timePeriod", e.target.value)
+                        }
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors ${
+                          validationErrors.timePeriod && showValidation
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        }`}
+                        placeholder="e.g., 2021 - 2025 or Sept 2021 - Present"
+                        required
+                      />
+                      <ValidationError error={validationErrors.timePeriod} />
                     </div>
 
                     {/* LinkedIn Field */}
-
-                    {/* LinkedIn Field - NOW REQUIRED */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         LinkedIn Profile <span className="text-red-500">*</span>
@@ -938,26 +1127,26 @@ const HR_Profile = () => {
                       <ValidationError error={validationErrors.linkedin} />
                     </div>
 
-                    {/* Work Period Field */}
+                    {/* GitHub Field */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Work Period <span className="text-red-500">*</span>
+                        GitHub Profile <span className="text-red-500">*</span>
                       </label>
                       <input
-                        type="text"
-                        value={editData.period || ""}
+                        type="url"
+                        value={editData.github || ""}
                         onChange={(e) =>
-                          handleInputChange("period", e.target.value)
+                          handleInputChange("github", e.target.value)
                         }
-                        className={`w-full px-3 py-2 border rounded-lg transition-colors ${
-                          validationErrors.period && showValidation
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-indigo-200 focus:border-indigo-500 transition-colors ${
+                          validationErrors.github && showValidation
                             ? "border-red-500"
                             : "border-gray-300"
                         }`}
-                        placeholder="e.g., May 2023 - Present"
+                        placeholder="https://github.com/yourusername"
                         required
                       />
-                      <ValidationError error={validationErrors.period} />
+                      <ValidationError error={validationErrors.github} />
                     </div>
 
                     {/* About Field */}
@@ -988,48 +1177,50 @@ const HR_Profile = () => {
                       </div>
                     </div>
 
-                    {/* Company Logo Upload */}
-
-                    {/* Company Logo Upload - NOW REQUIRED */}
+                    {/* Resume Upload */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Company Logo <span className="text-red-500">*</span>
+                        Resume <span className="text-red-500">*</span>
                       </label>
                       <div
-                        className={`w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer border-2 border-dashed hover:bg-gray-50 hover:border-indigo-400 transition-colors duration-300 ${
-                          validationErrors.companyLogo && showValidation
+                        className={`w-full h-16 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer border-2 border-dashed hover:bg-gray-50 hover:border-indigo-400 transition-colors duration-300 ${
+                          validationErrors.resume && showValidation
                             ? "border-red-400"
                             : "border-gray-300"
                         }`}
-                        onClick={() => companyLogoRef.current?.click()}
+                        onClick={() => resumeRef.current?.click()}
                       >
-                        {imageUploading.companyLogo ? (
+                        {uploading.resume ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
-                        ) : editData.companyLogo &&
-                          editData.companyLogo !== "loading" ? (
-                          <img
-                            src={editData.companyLogo}
-                            alt="Company Logo"
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        ) : editData.companyLogo === "loading" ? (
-                          <div className="animate-pulse bg-gray-300 w-12 h-12 rounded"></div>
+                        ) : editData.resume && editData.resume !== "loading" ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">
+                                PDF
+                              </span>
+                            </div>
+                            <span className="text-sm text-gray-700">
+                              Resume uploaded
+                            </span>
+                          </div>
+                        ) : editData.resume === "loading" ? (
+                          <div className="animate-pulse bg-gray-300 w-20 h-8 rounded"></div>
                         ) : (
-                          <span className="text-xs text-gray-500">
-                            Upload Logo
+                          <span className="text-sm text-gray-500">
+                            Click to upload resume (PDF)
                           </span>
                         )}
                       </div>
                       <p className="text-xs text-gray-400 mt-1">
-                        Click to upload company logo{" "}
+                        PDF files only, max 5MB{" "}
                         <span className="text-red-500">(required)</span>
                       </p>
-                      <ValidationError error={validationErrors.companyLogo} />
+                      <ValidationError error={validationErrors.resume} />
                       <input
                         type="file"
-                        ref={companyLogoRef}
-                        onChange={(e) => handleFileUpload(e, "companyLogo")}
-                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        ref={resumeRef}
+                        onChange={(e) => handleFileUpload(e, "resume")}
+                        accept="application/pdf"
                         className="hidden"
                       />
                     </div>
@@ -1058,14 +1249,14 @@ const HR_Profile = () => {
                       onClick={handleSave}
                       disabled={
                         loading ||
-                        imageUploading.profilePic ||
-                        imageUploading.companyLogo ||
+                        uploading.profilePic ||
+                        uploading.resume ||
                         !isFormValid
                       }
                       className={`flex-1 py-2 rounded-xl font-medium transition-colors duration-300 shadow-md hover:shadow-lg ${
                         loading ||
-                        imageUploading.profilePic ||
-                        imageUploading.companyLogo ||
+                        uploading.profilePic ||
+                        uploading.resume ||
                         !isFormValid
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
@@ -1094,7 +1285,7 @@ const HR_Profile = () => {
                     <div className="mt-3 text-center">
                       <p className="text-xs text-gray-500">
                         Complete all required fields including profile picture
-                        and company logo to save
+                        and resume to save
                       </p>
                     </div>
                   )}
@@ -1108,7 +1299,7 @@ const HR_Profile = () => {
       {/* Back to Dashboard Button - Fixed Position */}
       <div className="fixed bottom-6 right-6 z-40">
         {/* <Link
-          to="/hr-dashboard"
+          to="/student-dashboard"
           className="inline-flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm"
         >
           <svg
@@ -1131,4 +1322,4 @@ const HR_Profile = () => {
   );
 };
 
-export default HR_Profile;
+export default Student_Profile;

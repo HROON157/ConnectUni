@@ -49,8 +49,8 @@ const Login = () => {
         return !!(
           profileData.name && 
           profileData.university && 
-          profileData.degree && 
-          profileData.year
+          profileData.degreeProgram && 
+          profileData.timePeriod
         );
       }
     } catch (error) {
@@ -334,7 +334,7 @@ const Login = () => {
         closeOnClick
         rtl={false}
         pauseOnFocusLoss={false}
-        draggable
+        draggable 
         pauseOnHover={false}
         theme="light"
         className="mt-16"

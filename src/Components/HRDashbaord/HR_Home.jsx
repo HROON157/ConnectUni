@@ -66,21 +66,26 @@ const HR_Home = () => {
     }
   }, [user]);
 
-  const handleCloseJob = async (jobId) => {
-    if (window.confirm("Are you sure you want to close this job opening?")) {
-      try {
-        setClosingJob(jobId);
-        await closeJobOpening(jobId);
-        const updatedOpenings = await getJobOpenings();
+const handleCloseJob = async (jobId) => {
+  if (window.confirm("Are you sure you want to close this job opening?")) {
+    try {
+      setClosingJob(jobId);
+      await closeJobOpening(jobId);
+      
+      // Fetch updated openings for current user only
+      const currentUserId = user?.uid || localStorage.getItem("uid");
+      if (currentUserId && currentUserId !== "null" && currentUserId !== "undefined") {
+        const updatedOpenings = await getJobOpenings(currentUserId);
         setJobOpenings(updatedOpenings);
-      } catch (error) {
-        console.error("Error closing job opening:", error);
-        alert("Failed to close job opening. Please try again.");
-      } finally {
-        setClosingJob(null);
       }
+    } catch (error) {
+      console.error("Error closing job opening:", error);
+      alert("Failed to close job opening. Please try again.");
+    } finally {
+      setClosingJob(null);
     }
-  };
+  }
+};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,21 +104,36 @@ const HR_Home = () => {
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
+  // Replace the existing useEffect that fetches job openings with this:
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log("Fetching job openings from component...");
-        const data = await getJobOpenings();
-        console.log("Job openings received:", data);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      console.log("Fetching job openings from component...");
+      
+      // Get current user ID
+      const currentUserId = user?.uid || localStorage.getItem("uid");
+      
+      if (currentUserId && currentUserId !== "null" && currentUserId !== "undefined") {
+        // Pass userId to filter jobs by current HR user
+        const data = await getJobOpenings(currentUserId);
+        console.log("Job openings received for user:", currentUserId, data);
         setJobOpenings(data);
-      } catch (error) {
-        console.error("Error loading job openings:", error);
+      } else {
+        console.log("No valid user ID found");
+        setJobOpenings([]);
       }
-    };
+    } catch (error) {
+      console.error("Error loading job openings:", error);
+      setJobOpenings([]);
+    }
+  };
 
+  
+  if (user?.uid || localStorage.getItem("uid")) {
     fetchData();
-  }, []);
+  }
+}, [user]); 
 
   if (loading) {
     return (

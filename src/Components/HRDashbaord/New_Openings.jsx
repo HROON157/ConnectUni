@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addJobOpening } from "../../Firebase/auth";
+import { createJobOpening } from "../../Firebase/auth";
 import { auth } from "../../Firebase/db";
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -104,14 +104,14 @@ const New_Openings = () => {
       const jobData = {
         ...formData,
         status: 'active',
-        postedBy: currentUser.uid,
-        postedByEmail: currentUser.email,
+        // postedBy: currentUser.uid,
+        // postedByEmail: currentUser.email,
         applicationsCount: 0
       };
       
       console.log("📝 Sending job data:", jobData);
-      
-      const jobId = await addJobOpening(jobData);
+
+      const jobId = await createJobOpening(jobData, currentUser.uid);
       console.log("✅ Job Opening created with ID:", jobId);
 
       toast.success("🎉 Job opening created successfully!", {
