@@ -20,6 +20,9 @@ import Student_Profile from './Components/StudentDashboard/Student_Profile'
 import { AuthProvider } from './Context/Context'
 import PastApplications from './Components/StudentDashboard/PastApplications'
 import ActiveApplications from './Components/StudentDashboard/ActiveApplications'
+import Companies from './Components/CompanyProfile/Companies'
+import Systems from "./Components/CompanyProfile/Systems"
+import Netsol from "./Components/CompanyProfile/Netsol"
 function App() {
   return (
     <AuthProvider>
@@ -45,6 +48,9 @@ function App() {
             <Route path='/student-profile' element={<Student_Profile />} />
             <Route path='past-applications' element={<PastApplications/>}/>
             <Route path='active-applications' element={<ActiveApplications/>}/>
+            <Route path='browse-companies' element={<Companies/>}/>
+            <Route path="/company/systems" element={<Systems />} />
+            <Route path="/company/netsol" element={<Netsol />} />
           </Routes>
         </div>
       </Router>
