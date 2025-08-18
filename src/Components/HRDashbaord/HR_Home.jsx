@@ -7,7 +7,8 @@ import {
 } from "../Charts/PieChartCard";
 import { Link } from "react-router-dom";
 import { getJobOpenings, closeJobOpening } from "../../Firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { updateApplicationStatus } from "../../Firebase/applicationService";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "../../Firebase/db";
 import { onAuthStateChanged } from "firebase/auth";
 import QuickLogo from "../../assets/car.png";
@@ -16,6 +17,7 @@ import PastOpeningLogo from "../../assets/time-past.png";
 import AddOpeningLogo from "../../assets/plus.png";
 import BrowseUniLogo from "../../assets/education.png";
 import CurrentopningLogo from "../../assets/briefcase.png";
+
 const HR_Home = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +25,10 @@ const HR_Home = () => {
   const [closingJob, setClosingJob] = useState(null);
   const [hrProfile, setHrProfile] = useState(null);
   const [user, setUser] = useState(null);
-
+  const [selectedJobApplications, setSelectedJobApplications] = useState(null);
+  const [showApplicationsModal, setShowApplicationsModal] = useState(false);
+  const [loadingApplications, setLoadingApplications] = useState(false);
+  const [studentProfiles, setStudentProfiles] = useState({});
   const fetchHRProfile = async () => {
     try {
       const uid = user?.uid || localStorage.getItem("uid");
@@ -39,6 +44,28 @@ const HR_Home = () => {
       console.error("Error fetching HR profile:", error);
     }
   };
+  const fetchStudentProfile = async (studentId) => {
+    try {
+      if (studentProfiles[studentId]) {
+        return studentProfiles[studentId];
+      }
+
+      const studentDoc = await getDoc(doc(db, "studentProfiles", studentId));
+      if (studentDoc.exists()) {
+        const profileData = studentDoc.data();
+        setStudentProfiles(prev => ({
+          ...prev,
+          [studentId]: profileData
+        }));
+        return profileData;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching student profile:", error);
+      return null;
+    }
+  };
+
 
   const getDisplayName = () => {
     return hrProfile?.name || localStorage.getItem("userName") || "HR User";
@@ -66,26 +93,148 @@ const HR_Home = () => {
     }
   }, [user]);
 
-const handleCloseJob = async (jobId) => {
-  if (window.confirm("Are you sure you want to close this job opening?")) {
+  const handleCloseJob = async (jobId) => {
+    if (window.confirm("Are you sure you want to close this job opening?")) {
+      try {
+        setClosingJob(jobId);
+        await closeJobOpening(jobId);
+        
+        // Fetch updated openings for current user only
+        const currentUserId = user?.uid || localStorage.getItem("uid");
+        if (currentUserId && currentUserId !== "null" && currentUserId !== "undefined") {
+          const updatedOpenings = await getJobOpenings(currentUserId);
+          setJobOpenings(updatedOpenings);
+        }
+      } catch (error) {
+        console.error("Error closing job opening:", error);
+        alert("Failed to close job opening. Please try again.");
+      } finally {
+        setClosingJob(null);
+      }
+    }
+  };
+
+  // Updated handleViewApplications function
+const handleViewApplications = async (job) => {
     try {
-      setClosingJob(jobId);
-      await closeJobOpening(jobId);
+      setLoadingApplications(true);
+      setShowApplicationsModal(true);
       
-      // Fetch updated openings for current user only
-      const currentUserId = user?.uid || localStorage.getItem("uid");
-      if (currentUserId && currentUserId !== "null" && currentUserId !== "undefined") {
-        const updatedOpenings = await getJobOpenings(currentUserId);
-        setJobOpenings(updatedOpenings);
+      // Fetch applications for this specific job
+      const q = query(
+        collection(db, "applications"),
+        where("jobId", "==", job.id)
+      );
+      
+      const snapshot = await getDocs(q);
+      const applications = [];
+      
+      for (const docSnap of snapshot.docs) {
+        const appData = docSnap.data();
+        
+        // Fetch student profile for each application
+        const studentProfile = await fetchStudentProfile(appData.studentId);
+        
+        applications.push({
+          id: docSnap.id,
+          ...appData,
+          studentProfile: studentProfile || {
+            name: "Unknown Student",
+            email: "N/A",
+            university: "N/A",
+            phone: "N/A",
+            skills: [],
+            experience: "N/A"
+          }
+        });
+      }
+      
+      // Sort applications by application date (newest first)
+      applications.sort((a, b) => {
+        const dateA = a.appliedAt?.toDate ? a.appliedAt.toDate() : new Date(a.appliedAt);
+        const dateB = b.appliedAt?.toDate ? b.appliedAt.toDate() : new Date(b.appliedAt);
+        return dateB - dateA;
+      });
+      
+      setSelectedJobApplications({
+        job,
+        applications
+      });
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+      alert("Failed to load applications");
+      setShowApplicationsModal(false);
+    } finally {
+      setLoadingApplications(false);
+    }
+  };
+
+
+  const handleUpdateApplicationStatus = async (applicationId, status) => {
+    try {
+      await updateApplicationStatus(applicationId, status);
+      // Refresh applications
+      if (selectedJobApplications?.job?.id) {
+        await handleViewApplications(selectedJobApplications.job);
       }
     } catch (error) {
-      console.error("Error closing job opening:", error);
-      alert("Failed to close job opening. Please try again.");
-    } finally {
-      setClosingJob(null);
+      console.error("Error updating application status:", error);
+      alert("Failed to update application status");
     }
-  }
-};
+  };
+
+  // Format date helper
+  const formatDate = (timestamp) => {
+    if (!timestamp) return 'N/A';
+    
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return 'N/A';
+    }
+  };
+
+  // Get status badge component
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      pending: {
+        color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        text: 'Pending'
+      },
+      applied: {
+        color: 'bg-blue-100 text-blue-800 border-blue-200',
+        text: 'Applied'
+      },
+      interviewing: {
+        color: 'bg-purple-100 text-purple-800 border-purple-200',
+        text: 'Interviewing'
+      },
+      accepted: {
+        color: 'bg-green-100 text-green-800 border-green-200',
+        text: 'Accepted'
+      },
+      rejected: {
+        color: 'bg-red-100 text-red-800 border-red-200',
+        text: 'Rejected'
+      }
+    };
+
+    const config = statusConfig[status] || statusConfig.pending;
+    
+    return (
+      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${config.color}`}>
+        {config.text}
+      </span>
+    );
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,36 +253,34 @@ const handleCloseJob = async (jobId) => {
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
-  // Replace the existing useEffect that fetches job openings with this:
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      console.log("Fetching job openings from component...");
-      
-      // Get current user ID
-      const currentUserId = user?.uid || localStorage.getItem("uid");
-      
-      if (currentUserId && currentUserId !== "null" && currentUserId !== "undefined") {
-        // Pass userId to filter jobs by current HR user
-        const data = await getJobOpenings(currentUserId);
-        console.log("Job openings received for user:", currentUserId, data);
-        setJobOpenings(data);
-      } else {
-        console.log("No valid user ID found");
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("Fetching job openings from component...");
+        
+        // Get current user ID
+        const currentUserId = user?.uid || localStorage.getItem("uid");
+        
+        if (currentUserId && currentUserId !== "null" && currentUserId !== "undefined") {
+          // Pass userId to filter jobs by current HR user
+          const data = await getJobOpenings(currentUserId);
+          console.log("Job openings received for user:", currentUserId, data);
+          setJobOpenings(data);
+        } else {
+          console.log("No valid user ID found");
+          setJobOpenings([]);
+        }
+      } catch (error) {
+        console.error("Error loading job openings:", error);
         setJobOpenings([]);
       }
-    } catch (error) {
-      console.error("Error loading job openings:", error);
-      setJobOpenings([]);
-    }
-  };
+    };
 
-  
-  if (user?.uid || localStorage.getItem("uid")) {
-    fetchData();
-  }
-}, [user]); 
+    if (user?.uid || localStorage.getItem("uid")) {
+      fetchData();
+    }
+  }, [user]); 
 
   if (loading) {
     return (
@@ -371,7 +518,10 @@ useEffect(() => {
                       </p>
 
                       <div className="flex flex-wrap gap-4">
-                        <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center">
+                        <button 
+                          onClick={() => handleViewApplications(job)}
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
+                        >
                           <svg
                             className="w-5 h-5 mr-2"
                             fill="currentColor"
@@ -499,6 +649,309 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+
+      {/* Applications Modal - Mobile Responsive */}
+      {showApplicationsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg sm:text-2xl font-bold truncate">Applications</h3>
+                  <p className="text-blue-100 text-sm sm:text-base truncate">
+                    {selectedJobApplications?.job?.jobTitle} - {hrProfile?.company}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowApplicationsModal(false)}
+                  className="text-white hover:text-red-200 transition-colors ml-4 flex-shrink-0"
+                >
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-3 sm:p-6 overflow-y-auto max-h-[calc(95vh-80px)] sm:max-h-[calc(90vh-120px)]">
+              {loadingApplications ? (
+                <div className="flex items-center justify-center py-8 sm:py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600"></div>
+                  <span className="ml-3 text-gray-600 text-sm sm:text-base">Loading applications...</span>
+                </div>
+              ) : selectedJobApplications?.applications?.length > 0 ? (
+                <div className="space-y-4 sm:space-y-6">
+                  {selectedJobApplications.applications.map((application) => (
+                    <div key={application.id} className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+                      
+                      {/* Student Header - Mobile Optimized */}
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 space-y-4 sm:space-y-0">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          {/* Avatar - Responsive */}
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0">
+                            {application.studentProfile?.profilePic ? (
+                              <img 
+                                src={application.studentProfile.profilePic} 
+                                alt={`${application.studentProfile?.name || 'Student'} Avatar`}
+                                className="w-full h-full object-cover rounded-lg sm:rounded-xl" 
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <span 
+                              className={`text-white font-bold text-sm sm:text-base md:text-xl ${
+                                application.studentProfile?.profilePic ? 'hidden' : 'flex'
+                              } items-center justify-center w-full h-full`}
+                            >
+                              {application.studentProfile?.name?.charAt(0)?.toUpperCase() || 
+                               application.studentProfile?.studentEmail?.charAt(0)?.toUpperCase() || 
+                               '?'}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 truncate">
+                              {application.studentProfile?.name || 'Unknown Student'}
+                            </h4>
+                            <p className="text-gray-600 text-sm truncate">
+                              {application.studentProfile?.university || 'N/A'}
+                            </p>
+                            <p className="text-gray-500 text-xs mt-1">
+                              Applied {formatDate(application.appliedAt)}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Status Badge */}
+                        <div className="flex justify-start sm:justify-end">
+                          {getStatusBadge(application.status)}
+                        </div>
+                      </div>
+
+                      {/* Student Information Grid - Mobile Stacked */}
+                      <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                        
+                        {/* Personal Information */}
+                        <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                          <h5 className="font-semibold text-gray-800 mb-3 flex items-center text-sm sm:text-base">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Personal Information
+                          </h5>
+                          <div className="space-y-2 sm:space-y-3">
+                            {(application.studentProfile?.studentEmail || application.studentEmail) && (
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                <span className="text-xs sm:text-sm text-gray-600 font-medium">Email:</span>
+                                  {application.studentEmail || application.studentProfile?.studentEmail}
+                              </div>
+                            )}
+                            {application.studentProfile?.degreeProgram && (
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                <span className="text-xs sm:text-sm text-gray-600 font-medium">Degree:</span>
+                                <span className="text-xs sm:text-sm font-medium text-gray-800 break-words">
+                                  {application.studentProfile.degreeProgram}
+                                </span>
+                              </div>
+                            )}
+                            {application.studentProfile?.timePeriod && (
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                <span className="text-xs sm:text-sm text-gray-600 font-medium">Duration:</span>
+                                <span className="text-xs sm:text-sm font-medium text-gray-800">
+                                  {application.studentProfile.timePeriod}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Professional Links */}
+                        <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                          <h5 className="font-semibold text-gray-800 mb-3 flex items-center text-sm sm:text-base">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                            Professional Links
+                          </h5>
+                          <div className="space-y-2 sm:space-y-3">
+                            {application.studentProfile?.github && (
+                              <a 
+                                href={application.studentProfile.github.startsWith('http') ? application.studentProfile.github : `https://${application.studentProfile.github}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-between p-2 sm:p-3 bg-gray-800 hover:bg-gray-900 rounded-lg transition-colors group"
+                              >
+                                <div className="flex items-center min-w-0">
+                                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white mr-2 sm:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                  </svg>
+                                  <span className="text-white font-medium text-sm sm:text-base truncate">GitHub</span>
+                                </div>
+                                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 group-hover:text-white transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              </a>
+                            )}
+                            {application.studentProfile?.linkedin && (
+                              <a 
+                                href={application.studentProfile.linkedin.startsWith('http') ? application.studentProfile.linkedin : `https://${application.studentProfile.linkedin}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-between p-2 sm:p-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors group"
+                              >
+                                <div className="flex items-center min-w-0">
+                                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white mr-2 sm:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                  </svg>
+                                  <span className="text-white font-medium text-sm sm:text-base truncate">LinkedIn</span>
+                                </div>
+                                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-blue-200 group-hover:text-white transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              </a>
+                            )}
+                            
+                            {/* Resume Section - Mobile Optimized */}
+                            {application.studentProfile?.resume && (
+                              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-200">
+                                <div className="flex items-center justify-between gap-2">
+                                  <h5 className="font-semibold text-gray-800 flex items-center text-sm">
+                                    <svg className="w-4 h-4 mr-2 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span className="truncate">Resume</span>
+                                  </h5>
+                                  <a
+                                    href={application.studentProfile.resume}
+                                    download={`Resume_${application.studentProfile?.name?.replace(/\s+/g, '_') || 'Student'}.pdf`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors flex items-center group flex-shrink-0"
+                                    title={`Download Resume - ${application.studentProfile?.name || 'Student'}`}
+                                  >
+                                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span className="text-xs sm:text-sm">Download</span>
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* About Section */}
+                        {(application.studentProfile?.about || application.studentProfile?.bio) && (
+                          <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                            <h5 className="font-semibold text-gray-800 mb-3 flex items-center text-sm sm:text-base">
+                              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              About
+                            </h5>
+                            <div className="space-y-2">
+                              {application.studentProfile?.about && (
+                                <div>
+                                  <span className="text-xs text-gray-500 uppercase tracking-wide">About</span>
+                                  <p className="text-xs sm:text-sm text-gray-700 mt-1 leading-relaxed">
+                                    {application.studentProfile.about}
+                                  </p>
+                                </div>
+                              )}
+                              {application.studentProfile?.bio && (
+                                <div>
+                                  <span className="text-xs text-gray-500 uppercase tracking-wide">Bio</span>
+                                  <p className="text-xs sm:text-sm text-gray-700 mt-1 leading-relaxed">
+                                    {application.studentProfile.bio}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Application Actions - Mobile Responsive */}
+                      <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                        {(application.status === 'pending' || application.status === 'applied') && (
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                            <button
+                              onClick={() => handleUpdateApplicationStatus(application.id, 'interviewing')}
+                              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center text-sm sm:text-base"
+                            >
+                              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                              </svg>
+                              Interview
+                            </button>
+                            <button
+                              onClick={() => handleUpdateApplicationStatus(application.id, 'accepted')}
+                              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center text-sm sm:text-base"
+                            >
+                              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => handleUpdateApplicationStatus(application.id, 'rejected')}
+                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center text-sm sm:text-base"
+                            >
+                              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Reject
+                            </button>
+                          </div>
+                        )}
+
+                        {application.status === 'interviewing' && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                            <button
+                              onClick={() => handleUpdateApplicationStatus(application.id, 'accepted')}
+                              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center text-sm sm:text-base"
+                            >
+                              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Accept Candidate
+                            </button>
+                            <button
+                              onClick={() => handleUpdateApplicationStatus(application.id, 'rejected')}
+                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center text-sm sm:text-base"
+                            >
+                              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              Reject Candidate
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 sm:py-12">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Applications Yet</h3>
+                  <p className="text-gray-600 text-sm sm:text-base">This job hasn't received any applications yet.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };

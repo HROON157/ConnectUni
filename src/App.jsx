@@ -18,6 +18,8 @@ import PastOpening from './Components/HRDashbaord/PastOpening'
 import HR_Profile from './Components/HRDashbaord/HR_Profile'
 import Student_Profile from './Components/StudentDashboard/Student_Profile'
 import { AuthProvider } from './Context/Context'
+import PastApplications from './Components/StudentDashboard/PastApplications'
+import ActiveApplications from './Components/StudentDashboard/ActiveApplications'
 function App() {
   return (
     <AuthProvider>
@@ -41,6 +43,8 @@ function App() {
             <Route path='/past-openings' element={<PastOpening />} />
             <Route path='/hr-profile' element={<HR_Profile />} />
             <Route path='/student-profile' element={<Student_Profile />} />
+            <Route path='past-applications' element={<PastApplications/>}/>
+            <Route path='active-applications' element={<ActiveApplications/>}/>
           </Routes>
         </div>
       </Router>

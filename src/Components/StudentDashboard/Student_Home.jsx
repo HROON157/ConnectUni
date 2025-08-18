@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { db } from "../../Firebase/db";
+import { Link } from "react-router-dom";
+import PastOpeningLogo from "../../assets/time-past.png";
+import ActiveLogo from "../../assets/activities.png"
+import BrowseCompanyLogo from "../../assets/computer-business.png"
+import { db,auth } from "../../Firebase/db";
+import { submitJobApplication,checkExistingApplication } from "../../Firebase/applicationService";
+
 import {
   collection,
   getDocs,
+  addDoc,
   limit,
   query,
   where,
@@ -18,6 +25,8 @@ const Student_Home = () => {
   const [hrProfiles, setHrProfiles] = useState({});
   const [expandedJobs, setExpandedJobs] = useState({});
   const [dataLoaded,setDataLoaded] = useState(false);
+  const [applicationStatus, setApplicationStatus] = useState({});
+  const [applying, setApplying] = useState(false);
   // Toggle accordion
   const toggleJobDetails = (jobId) => {
     setExpandedJobs((prev) => ({
@@ -44,6 +53,60 @@ const Student_Home = () => {
       throw error;
     }
   }, []);
+  const handleApplyForJob = async (job) => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      alert("Please log in to apply for jobs");
+      return;
+    }
+
+    try {
+      setApplying(true);
+      
+      // Check if already applied
+      const hasApplied = await checkExistingApplication(job.id, userId);
+      if (hasApplied) {
+        alert("You have already applied for this position");
+        return;
+      }
+
+      // Submit application - only pass jobId, function will fetch jobTitle and companyName
+      const result = await submitJobApplication(job.id);
+
+      if (result.success) {
+        alert("Application submitted successfully!");
+        setApplicationStatus(prev => ({
+          ...prev,
+          [job.id]: "applied"
+        }));
+      }
+    } catch (error) {
+      console.error("Error applying for job:", error);
+      alert("Failed to submit application. Please try again.");
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  // Check application status for each job
+  const checkApplicationStatuses = useCallback(async () => {
+    const userId = auth.currentUser?.uid;
+    if (!userId || jobs.length === 0) return;
+
+    const statuses = {};
+    for (const job of jobs) {
+      try {
+        const hasApplied = await checkExistingApplication(job.id, userId);
+        if (hasApplied) {
+          statuses[job.id] = "applied";
+        }
+      } catch (error) {
+        console.error("Error checking application status:", error);
+      }
+    }
+    setApplicationStatus(statuses);
+  }, [jobs]);
+
 
   // Fixed HR profile fetching - try both collections
   const fetchHRProfile = useCallback(
@@ -114,6 +177,13 @@ const Student_Home = () => {
       isMounted = false;
     };
   }, [fetchJobData, fetchHRProfile]);
+
+  // Check application statuses after jobs are loaded
+  useEffect(() => {
+    if (dataLoaded && jobs.length > 0) {
+      checkApplicationStatuses();
+    }
+  }, [dataLoaded, jobs, checkApplicationStatuses]);
 
   // Enhanced responsive company logo component
   const CompanyLogo = React.memo(
@@ -192,6 +262,7 @@ const Student_Home = () => {
   const JobDetailsAccordion = React.memo(({ job, isExpanded }) => {
     const hrProfile = hrProfiles[job.postedBy];
     const companyName = hrProfile?.company;
+    const hasApplied = applicationStatus[job.id] === "applied";
 
     if (!isExpanded) return null;
 
@@ -357,8 +428,23 @@ const Student_Home = () => {
                 </div>
               )}
 
-              <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-8 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 shadow-lg text-center">
-                Apply for this Position
+              <button 
+                onClick={() => handleApplyForJob(job)}
+                disabled={applying || hasApplied}
+                className={`w-full font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg text-center ${
+                  hasApplied 
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : applying
+                    ? "bg-gray-500 text-white cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 hover:scale-105"
+                }`}
+              >
+                {hasApplied 
+                  ? "Already Applied" 
+                  : applying 
+                  ? "Applying..." 
+                  : "Apply for this Position"
+                }
               </button>
             </div>
           </div>
@@ -564,9 +650,64 @@ const Student_Home = () => {
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-gray-800 via-blue-800 to-indigo-800 bg-clip-text  mb-4">
             Hello, {userName}{" "}
           </h1>
-          <h2 className="text-2xl sm:text-2xl lg:text-2xl  text-gray-900 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
+            <Link to="/past-applications" className="group">
+              <div className="bg-white/90 backdrop-blur-2xl hover:bg-white transition-all duration-300 rounded-3xl shadow-lg hover:shadow-xl border border-blue-200/30 p-8 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 w-20 h-20 bg-blue-500/5 rounded-full filter blur-lg"></div>
+                <div className="text-center relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                    <img
+                      src={PastOpeningLogo}
+                      alt="Past Applications"
+                      className="w-7 h-7 filter brightness-0 invert"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors">
+                    Past Applications
+                  </h3>
+                </div>
+              </div>
+            </Link>
+
+            <Link to="/active-applications" className="group">
+              <div className="bg-white/90 backdrop-blur-2xl hover:bg-white transition-all duration-300 rounded-3xl shadow-lg hover:shadow-xl border border-green-200/30 p-8 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 w-20 h-20 bg-green-500/5 rounded-full filter blur-lg"></div>
+                <div className="text-center relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                    <img
+                      src={ActiveLogo}
+                      alt="Active Applications"
+                      className="w-9 h-9 filter brightness-0 invert"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 group-hover:text-green-700 transition-colors">
+                    Active Applications
+                  </h3>
+                </div>
+              </div>
+            </Link>
+
+            <Link to="/browse-companies" className="group">
+              <div className="bg-white/90 backdrop-blur-2xl hover:bg-white transition-all duration-300 rounded-3xl shadow-lg hover:shadow-xl border border-purple-200/30 p-8 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 w-20 h-20 bg-purple-500/5 rounded-full filter blur-lg"></div>
+                <div className="text-center relative z-10">
+                  <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                    <img
+                      src={BrowseCompanyLogo}
+                      alt="Browse Companies"
+                      className="w-9 h-9 filter brightness-0 invert"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 group-hover:text-purple-700 transition-colors">
+                    Browse Companies
+                  </h3>
+                </div>
+              </div>
+            </Link>
+          </div>
+          <h1 className="text-3xl sm:text-2xl lg:text-3xl mt-5 text-gray-900 mb-4">
             Explore Opportunities
-          </h2>
+          </h1>
           <p className="text-gray-600 text-lg">
             Discover amazing career opportunities that match your skills and
             interests.
