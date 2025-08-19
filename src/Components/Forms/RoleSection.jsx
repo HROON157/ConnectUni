@@ -5,6 +5,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { toast, ToastContainer } from "react-toastify";
 import { signUpWithRole } from "../../Firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
+import OpteraLogo from "../../assets/Logo.png"
 const CombinedSignup = ({ userRole = "student" }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -71,15 +72,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
     const loadingToastId = toast.loading("Creating your account...");
 
     try {
-      console.log("Attempting signup with:", {
-        email: formData.email,
-        passwordLength: formData.password.length,
-        role: formData.role,
-      });
-
       const result = await signUpWithRole(formData);
-      console.log("User created successfully:", result);
-
       toast.dismiss(loadingToastId);
       toast.success("Account created successfully! Redirecting to login...", {
         onClose: () => navigate("/login"),
@@ -89,8 +82,6 @@ const CombinedSignup = ({ userRole = "student" }) => {
         navigate("/login");
       }, 2500);
     } catch (error) {
-      console.error("Signup error:", error);
-
       toast.dismiss(loadingToastId);
       toast.error("Signup failed. Please try again.");
 
@@ -136,20 +127,25 @@ const CombinedSignup = ({ userRole = "student" }) => {
         <div className="flex items-center justify-center mb-6">
           <div className="flex items-center space-x-3 group">
             <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-300">
-                <span className="text-white font-bold text-xl">CU</span>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-400 via-purple-500 to-indigo-500 rounded-2xl opacity-20 blur-lg group-hover:opacity-30 transition-opacity duration-500"></div>
-            </div>
-            <span className="text-gray-800 font-bold text-2xl tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
-              ConnectUni
-            </span>
+                         <div className="flex items-center justify-center mb-0">
+                                <div className="flex items-center space-x-1">
+                        
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center  overflow-hidden">
+                          <img 
+                            src={OpteraLogo} 
+                            alt="Logo" 
+                            className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-contain"
+                          />
+                        </div>
+                        <span className="text-gray-800 font-bold text-xl sm:text-2xl font-giza bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                          Join Optera
+                        </span>
+                      </div>
+                              </div>
+                        </div>
+  
           </div>
         </div>
-
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 text-center">
-          Join ConnectUni
-        </h3>
         <p className="text-sm text-gray-600 text-center mb-6 cursor-pointer">
           Sign up to connect with{" "}
           {formData.role === "student" ? "opportunities" : "talented students"}
@@ -172,7 +168,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
             onClick={() => handleRoleChange("hr")}
             className={`px-6 py-2 rounded-xl cursor-pointer font-medium transition-all duration-200 ${
               formData.role === "hr"
-                ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md"
+                ? "bg-gradient-to-r from-blue-500 to-indigo-600  text-white shadow-md"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
@@ -517,16 +513,17 @@ const CombinedSignup = ({ userRole = "student" }) => {
             </Link>
             .
           </div>
-
           <div className="mt-4 flex justify-center">
-            <ReCAPTCHA
-              sitekey="6LdUPJcrAAAAAOTXcQy3X-1Tpi_dNt-UnCFxfq4Y"
-              size="normal"
-              onChange={handleCaptchaChange}
-              onExpired={handleCaptchaExpired}
-              onError={() => setVerified(false)}
-            />
-          </div>
+  <div className="recaptcha-container">
+    <ReCAPTCHA
+      sitekey="6LdUPJcrAAAAAOTXcQy3X-1Tpi_dNt-UnCFxfq4Y"
+      size="normal"
+      onChange={handleCaptchaChange}
+      onExpired={handleCaptchaExpired}
+      onError={() => setVerified(false)}
+    />
+  </div>
+</div>
 
           <div className="pt-4">
             <button
@@ -534,7 +531,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
               disabled={!verified}
               onMouseEnter={() => setIsHoveringSubmit(true)}
               onMouseLeave={() => setIsHoveringSubmit(false)}
-              className={`relative overflow-hidden cursor-pointer w-full font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm shadow-lg ${
+              className={`relative overflow-hidden  w-full font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm shadow-lg ${
                 verified
                   ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-blue-500/30"
                   : "bg-gray-300 cursor-not-allowed text-gray-500"
@@ -546,7 +543,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
               </span>
               {verified && (
                 <span
-                  className={`absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full ${
+                  className={`absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full ${
                     isHoveringSubmit ? "opacity-100" : "opacity-0"
                   }`}
                 ></span>

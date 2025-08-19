@@ -14,7 +14,6 @@ const PastOpening = () => {
   const [user, setUser] = useState(null);
   const [filter, setFilter] = useState('all');
 
-  // Fetch HR Profile data
   const fetchHRProfile = async () => {
     try {
       const uid = user?.uid || localStorage.getItem('uid');
@@ -27,11 +26,11 @@ const PastOpening = () => {
         setHrProfile(docSnap.data());
       }
     } catch (error) {
-      console.error('Error fetching HR profile:', error);
+     
     }
   };
 
-  // Monitor auth state
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -48,7 +47,7 @@ const PastOpening = () => {
     return () => unsubscribe();
   }, []);
 
-  // Fetch HR profile when user changes
+
   useEffect(() => {
     if (user) {
       fetchHRProfile();
@@ -63,20 +62,19 @@ useEffect(() => {
       const currentUserUID = user?.uid || auth.currentUser?.uid || localStorage.getItem('uid');
       
       if (!currentUserUID || currentUserUID === 'null' || currentUserUID === 'undefined') {
-        console.log('No user ID found, skipping fetch');
+       
         setPastJobOpenings([]);
         return;
       }
 
-      console.log('Fetching past openings for user:', currentUserUID);
       
-      // Use the optimized function that filters at database level
+    
       const userPastJobs = await getPastJobOpeningsByUser(currentUserUID);
       
-      console.log('User past jobs:', userPastJobs.length);
+   
       setPastJobOpenings(userPastJobs);
     } catch (error) {
-      console.error("Error fetching past job openings:", error);
+     
       setPastJobOpenings([]);
     } finally {
       setLoading(false);
@@ -125,18 +123,12 @@ useEffect(() => {
     );
   }
 
-  // Add debug info in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Current user:', user);
-    console.log('Past job openings:', pastJobOpenings);
-    console.log('Filtered jobs:', filteredJobs);
-  }
 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 py-4 sm:py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
+         
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-4 lg:space-y-0">
             <div className="flex items-center space-x-3">
@@ -162,7 +154,7 @@ useEffect(() => {
             </Link>
           </div>
 
-          {/* Stats Card */}
+          
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200 mb-4 sm:mb-6">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <div className="text-center">
@@ -190,7 +182,7 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Filter Section */}
+          
           {pastJobOpenings.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
@@ -218,8 +210,7 @@ useEffect(() => {
           )}
         </div>
 
-        {/* Main Content */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-3 sm:p-6">
+                <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-3 sm:p-6">
           {filteredJobs.length > 0 ? (
             <div className="space-y-3 sm:space-y-4">
               {filteredJobs.map((job, index) => (
@@ -228,7 +219,7 @@ useEffect(() => {
                   className="group bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-xl p-4 sm:p-6 hover:shadow-lg hover:border-gray-300 transition-all duration-300"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
-                    {/* Company Logo */}
+                    
                     <div className="relative flex-shrink-0 self-center sm:self-start">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center overflow-hidden shadow-md">
                         {hrProfile?.companyLogo ? (
@@ -248,8 +239,7 @@ useEffect(() => {
                       </div>
                     </div>
 
-                    {/* Job Details */}
-                    <div className="flex-1 min-w-0">
+                                        <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 space-y-2 sm:space-y-0">
                         <div className="flex-1">
                           <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors" style={{ fontFamily: "Public Sans" }}>
@@ -269,7 +259,7 @@ useEffect(() => {
                         </div>
                       </div>
 
-                      {/* Job Info Grid */}
+                      
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-3">
                         <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
                           <HiOutlineMapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -294,7 +284,7 @@ useEffect(() => {
                         )}
                       </div>
 
-                      {/* Job Description Preview */}
+                    
                       {job.jobDescription && (
                         <p className="text-gray-700 text-xs sm:text-sm line-clamp-2 mb-3" style={{ fontFamily: "Public Sans" }}>
                           {job.jobDescription.length > (window.innerWidth < 640 ? 100 : 150) 
@@ -304,8 +294,7 @@ useEffect(() => {
                         </p>
                       )}
 
-                      {/* Stats Row */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
                           <div className="flex items-center space-x-1 text-blue-600">
                             <HiOutlineBriefcase className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -345,7 +334,7 @@ useEffect(() => {
                 </p>
                 <div className="flex flex-col gap-3 sm:gap-4 justify-center">
                   <Link
-                    to="/new-openings"
+                    to="/add-new-opening"
                     className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base"
                     style={{ fontFamily: "Public Sans" }}
                   >

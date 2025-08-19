@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import PastOpeningLogo from "../../assets/time-past.png";
-import ActiveLogo from "../../assets/activities.png"
-import BrowseCompanyLogo from "../../assets/computer-business.png"
-import { db,auth } from "../../Firebase/db";
-import { submitJobApplication,checkExistingApplication } from "../../Firebase/applicationService";
+import ActiveLogo from "../../assets/activities.png";
+import BrowseCompanyLogo from "../../assets/computer-business.png";
+import { db, auth } from "../../Firebase/db";
+import {
+  submitJobApplication,
+  checkExistingApplication,
+} from "../../Firebase/applicationService";
 
 import {
   collection,
@@ -24,10 +27,10 @@ const Student_Home = () => {
   const [error, setError] = useState(null);
   const [hrProfiles, setHrProfiles] = useState({});
   const [expandedJobs, setExpandedJobs] = useState({});
-  const [dataLoaded,setDataLoaded] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState({});
   const [applying, setApplying] = useState(false);
-  // Toggle accordion
+
   const toggleJobDetails = (jobId) => {
     setExpandedJobs((prev) => ({
       ...prev,
@@ -35,7 +38,7 @@ const Student_Home = () => {
     }));
   };
 
-  // Memoized fetch function
+
   const fetchJobData = useCallback(async () => {
     try {
       const q = query(
@@ -49,7 +52,7 @@ const Student_Home = () => {
         ...doc.data(),
       }));
     } catch (error) {
-      console.error("Error fetching jobs:", error);
+  
       throw error;
     }
   }, []);
@@ -62,33 +65,29 @@ const Student_Home = () => {
 
     try {
       setApplying(true);
-      
-      // Check if already applied
+
+     
       const hasApplied = await checkExistingApplication(job.id, userId);
       if (hasApplied) {
         alert("You have already applied for this position");
         return;
       }
-
-      // Submit application - only pass jobId, function will fetch jobTitle and companyName
       const result = await submitJobApplication(job.id);
 
       if (result.success) {
         alert("Application submitted successfully!");
-        setApplicationStatus(prev => ({
+        setApplicationStatus((prev) => ({
           ...prev,
-          [job.id]: "applied"
+          [job.id]: "applied",
         }));
       }
     } catch (error) {
-      console.error("Error applying for job:", error);
       alert("Failed to submit application. Please try again.");
     } finally {
       setApplying(false);
     }
   };
 
-  // Check application status for each job
   const checkApplicationStatuses = useCallback(async () => {
     const userId = auth.currentUser?.uid;
     if (!userId || jobs.length === 0) return;
@@ -101,14 +100,11 @@ const Student_Home = () => {
           statuses[job.id] = "applied";
         }
       } catch (error) {
-        console.error("Error checking application status:", error);
       }
     }
     setApplicationStatus(statuses);
   }, [jobs]);
 
-
-  // Fixed HR profile fetching - try both collections
   const fetchHRProfile = useCallback(
     async (userId) => {
       try {
@@ -119,18 +115,17 @@ const Student_Home = () => {
         let hrDoc = await getDoc(doc(db, "hrProfiles", userId));
         if (hrDoc.exists()) {
           const profileData = hrDoc.data();
-          console.log("HR Profile found:", profileData);
+   
           setHrProfiles((prev) => ({
             ...prev,
             [userId]: profileData,
           }));
           return profileData;
         }
-        console.log("No HR profile found for userId:", userId);
+        
         return null;
       } catch (error) {
-        console.error("Error fetching HR profile:", error);
-        return null;
+             return null;
       }
     },
     [hrProfiles]
@@ -140,10 +135,10 @@ const Student_Home = () => {
     let isMounted = true;
     const loadJobsAndProfiles = async () => {
       try {
-        // setLoading(true);
+
         setError(null);
         const jobData = await fetchJobData();
-        console.log("Jobs fetched:", jobData);
+     
 
         if (isMounted) {
           setJobs(jobData);
@@ -151,7 +146,6 @@ const Student_Home = () => {
           const uniqueHRIds = [
             ...new Set(jobData.map((job) => job.postedBy).filter(Boolean)),
           ];
-          console.log("Unique HR IDs:", uniqueHRIds); // Debug log
 
           const profilePromises = uniqueHRIds.map((userId) =>
             fetchHRProfile(userId)
@@ -161,7 +155,7 @@ const Student_Home = () => {
       } catch (error) {
         if (isMounted) {
           setError("Failed to load job opportunities");
-          console.error(error);
+    
         }
       } finally {
         if (isMounted) {
@@ -178,14 +172,13 @@ const Student_Home = () => {
     };
   }, [fetchJobData, fetchHRProfile]);
 
-  // Check application statuses after jobs are loaded
+
   useEffect(() => {
     if (dataLoaded && jobs.length > 0) {
       checkApplicationStatuses();
     }
   }, [dataLoaded, jobs, checkApplicationStatuses]);
 
-  // Enhanced responsive company logo component
   const CompanyLogo = React.memo(
     ({ job, size = "w-16 h-16 sm:w-20 sm:h-20" }) => {
       const hrProfile = hrProfiles[job.postedBy];
@@ -229,7 +222,7 @@ const Student_Home = () => {
               alt={`${companyName} logo`}
               className="w-full h-full object-cover"
               onError={(e) => {
-                console.log("Image failed to load:", companyLogo); // Debug log
+
                 e.target.style.display = "none";
                 e.target.nextSibling.style.display = "flex";
               }}
@@ -258,7 +251,6 @@ const Student_Home = () => {
     }
   );
 
-  // Beautiful responsive job details accordion
   const JobDetailsAccordion = React.memo(({ job, isExpanded }) => {
     const hrProfile = hrProfiles[job.postedBy];
     const companyName = hrProfile?.company;
@@ -270,9 +262,9 @@ const Student_Home = () => {
       <div className="border-t border-gray-100 bg-gradient-to-br from-gray-50 to-white">
         <div className="p-4 sm:p-6 lg:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-            {/* Left side - Main content */}
+           
             <div className="lg:col-span-2 space-y-6">
-              {/* Company Info Card */}
+          
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-4">
                   <CompanyLogo job={job} size="w-16 h-16" />
@@ -291,7 +283,7 @@ const Student_Home = () => {
                 </div>
               </div>
 
-              {/* Job Description */}
+        
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
                   <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
@@ -318,7 +310,7 @@ const Student_Home = () => {
                 </div>
               </div>
 
-              {/* Requirements */}
+    
               {job.requirements && (
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
@@ -348,10 +340,9 @@ const Student_Home = () => {
               )}
             </div>
 
-            {/* Right side - Job info cards */}
+            
             <div className="space-y-4">
-              {/* Location */}
-              {job.location && (
+                   {job.location && (
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-gray-500 rounded-xl flex items-center justify-center text-black">
@@ -373,7 +364,7 @@ const Student_Home = () => {
                 </div>
               )}
 
-              {/* Job Type */}
+      
               {job.type && (
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
                   <div className="flex items-center gap-3 mb-3">
@@ -398,7 +389,7 @@ const Student_Home = () => {
                 </div>
               )}
 
-              {/* Compensation */}
+        
               {job.compensation && (
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
                   <div className="flex items-center gap-3 mb-3">
@@ -428,23 +419,22 @@ const Student_Home = () => {
                 </div>
               )}
 
-              <button 
+              <button
                 onClick={() => handleApplyForJob(job)}
                 disabled={applying || hasApplied}
-                className={`w-full font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg text-center ${
-                  hasApplied 
+                className={`w-full font-bold cursor-pointer py-4 px-8 rounded-xl transition-all duration-300 shadow-lg text-center ${
+                  hasApplied
                     ? "bg-gray-400 text-white cursor-not-allowed"
                     : applying
                     ? "bg-gray-500 text-white cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 hover:scale-105"
                 }`}
               >
-                {hasApplied 
-                  ? "Already Applied" 
-                  : applying 
-                  ? "Applying..." 
-                  : "Apply for this Position"
-                }
+                {hasApplied
+                  ? "Already Applied"
+                  : applying
+                  ? "Applying..."
+                  : "Apply for this Position"}
               </button>
             </div>
           </div>
@@ -453,115 +443,121 @@ const Student_Home = () => {
     );
   });
 
-  // Beautiful responsive job card
-  const JobCard = React.memo(({ job }) => {
-    const hrProfile = hrProfiles[job.postedBy];
-    const companyName = hrProfile?.company;
-    const isExpanded = expandedJobs[job.id];
 
-    return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-gray-200">
-        {/* Main job card */}
-        <div className="p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-            {/* Left side - Job info */}
-            <div className="flex-1 min-w-0 order-2 sm:order-1">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <p className="text-sm text-blue-600 font-semibold">
-                  {companyName}
-                </p>
-              </div>
+const JobCard = React.memo(({ job }) => {
+  const hrProfile = hrProfiles[job.postedBy];
+  const companyName = hrProfile?.company;
+  const isExpanded = expandedJobs[job.id];
 
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 leading-tight">
-                {job.jobTitle || job.title || "Position Available"}
-              </h3>
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 hover:border-gray-200">
 
-              <p className="text-gray-600 text-base leading-relaxed line-clamp-2 mb-6">
-                {job.jobDescription ||
-                  job.description ||
-                  "Exciting opportunity to join our team and contribute to innovative projects."}
+      <div className="p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+         
+          <div className="flex-1 min-w-0 order-2 sm:order-1">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+              <p className="text-xs sm:text-sm text-blue-600 font-semibold">
+                {companyName}
               </p>
-
-              {/* Metadata tags */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {job.type && (
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                    {job.type}
-                  </span>
-                )}
-                {job.location && (
-                  <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
-                    {job.location}
-                  </span>
-                )}
-                {job.compensation && (
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                    {job.compensation}
-                  </span>
-                )}
-              </div>
-
-              {/* Action button */}
-              <button
-                onClick={() => toggleJobDetails(job.id)}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-md"
-              >
-                {isExpanded ? (
-                  <>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 15l7-7 7 7"
-                      />
-                    </svg>
-                    Hide Details
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                    View Job Details
-                  </>
-                )}
-              </button>
             </div>
 
-            {/* Right side - Company logo */}
-            <div className="flex justify-center sm:justify-end order-1 sm:order-2">
-              <CompanyLogo
-                job={job}
-                size="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
-              />
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug">
+              {job.jobTitle || job.title || "Position Available"}
+            </h3>
+
+            <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4">
+              {job.jobDescription ||
+                job.description ||
+                "Exciting opportunity to join our team and contribute to innovative projects."}
+            </p>
+
+       
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {job.type && (
+                <span className="px-2.5 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                  {job.type}
+                </span>
+              )}
+              {job.location && (
+                <span className="px-2.5 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                  {job.location}
+                </span>
+              )}
+              {job.compensation && (
+                <span className="px-2.5 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                  {job.compensation}
+                </span>
+              )}
             </div>
+
+ 
+            <button
+              onClick={() => toggleJobDetails(job.id)}
+              className="inline-flex cursor-pointer items-center gap-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow"
+            >
+              {isExpanded ? (
+                <>
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 15l7-7 7 7"
+                    />
+                  </svg>
+                  Hide
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                  View Details
+                </>
+              )}
+            </button>
           </div>
+
+  
+<div className="flex flex-col items-center  order-1 sm:order-2">
+  <CompanyLogo
+    job={job}
+    size="w-28 h-28 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
+  />
+  {hrProfile?.company && (
+    <p className="text-xs text-gray-600 text-center sm:text-right mt-3  font-medium">
+      {hrProfile.company}
+    </p>
+  )}
+</div>
+
         </div>
-
-        {/* Accordion content */}
-        <JobDetailsAccordion job={job} isExpanded={isExpanded} />
       </div>
-    );
-  });
 
-  // Beautiful loading state
+
+      <JobDetailsAccordion job={job} isExpanded={isExpanded} />
+    </div>
+  );
+});
+
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -597,7 +593,7 @@ const Student_Home = () => {
     );
   }
 
-  // Error state
+  
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -641,171 +637,202 @@ const Student_Home = () => {
     );
   }
 
-  // Main content
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Beautiful header */}
-        <div className="mb-10">
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-gray-800 via-blue-800 to-indigo-800 bg-clip-text  mb-4">
-            Hello, {userName}{" "}
-          </h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
-            <Link to="/past-applications" className="group">
-              <div className="bg-white/90 backdrop-blur-2xl hover:bg-white transition-all duration-300 rounded-3xl shadow-lg hover:shadow-xl border border-blue-200/30 p-8 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute -right-6 -top-6 w-20 h-20 bg-blue-500/5 rounded-full filter blur-lg"></div>
-                <div className="text-center relative z-10">
-                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <img
-                      src={PastOpeningLogo}
-                      alt="Past Applications"
-                      className="w-7 h-7 filter brightness-0 invert"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors">
-                    Past Applications
-                  </h3>
-                </div>
-              </div>
-            </Link>
 
-            <Link to="/active-applications" className="group">
-              <div className="bg-white/90 backdrop-blur-2xl hover:bg-white transition-all duration-300 rounded-3xl shadow-lg hover:shadow-xl border border-green-200/30 p-8 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute -right-6 -top-6 w-20 h-20 bg-green-500/5 rounded-full filter blur-lg"></div>
-                <div className="text-center relative z-10">
-                  <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <img
-                      src={ActiveLogo}
-                      alt="Active Applications"
-                      className="w-9 h-9 filter brightness-0 invert"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 group-hover:text-green-700 transition-colors">
-                    Active Applications
-                  </h3>
-                </div>
-              </div>
-            </Link>
+return (
+  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+    <div className="max-w-7xl mx-auto">
 
-            <Link to="/browse-companies" className="group">
-              <div className="bg-white/90 backdrop-blur-2xl hover:bg-white transition-all duration-300 rounded-3xl shadow-lg hover:shadow-xl border border-purple-200/30 p-8 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute -right-6 -top-6 w-20 h-20 bg-purple-500/5 rounded-full filter blur-lg"></div>
-                <div className="text-center relative z-10">
-                  <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                    <img
-                      src={BrowseCompanyLogo}
-                      alt="Browse Companies"
-                      className="w-9 h-9 filter brightness-0 invert"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 group-hover:text-purple-700 transition-colors">
-                    Browse Companies
-                  </h3>
-                </div>
-              </div>
-            </Link>
-          </div>
-          <h1 className="text-3xl sm:text-2xl lg:text-3xl mt-5 text-gray-900 mb-4">
-            Explore Opportunities
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Discover amazing career opportunities that match your skills and
-            interests.
-          </p>
-        </div>
-
-        {loading && (
-          <div className="space-y-8">
-            {[...Array(3)].map((_, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 animate-pulse"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-                  <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-32 mb-3"></div>
-                    <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-                    <div className="space-y-2 mb-6">
-                      <div className="h-4 bg-gray-200 rounded w-full"></div>
-                      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                    </div>
-                    <div className="h-10 bg-gray-200 rounded w-40"></div>
-                  </div>
-                  <div className="w-32 h-32 bg-gray-200 rounded-2xl"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Show error state */}
-        {!loading && error && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-red-900 mb-2">
-              Something went wrong
-            </h3>
-            <p className="text-red-700 mb-4">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-700 transition-colors font-semibold"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* Show job listings */}
-        {!loading && !error && dataLoaded && jobs.length > 0 && (
-          <div className="space-y-8">
-            {jobs.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
-          </div>
-        )}
-
-        {/* Show no data message */}
-        {!loading && !error && dataLoaded && jobs.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-10 h-10 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"
-                />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              No opportunities available
-            </h3>
-            <p className="text-gray-500 text-lg">
-              Check back later for new job openings and internships.
+      <div className="mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
+              Welcome back, {userName}
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl">
+              Manage your career journey and discover new opportunities tailored for you.
             </p>
           </div>
-        )}
+          
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span className="text-sm text-gray-500">Latest opportunities updated</span>
+          </div>
+        </div>
+        
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          <Link to="/past-applications" className="group">
+            <div className="bg-white/95 backdrop-blur-xl hover:bg-white transition-all duration-300 rounded-2xl shadow-md hover:shadow-xl border border-gray-100 p-6 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden h-full">
+              <div className="absolute -right-4 -top-4 w-16 h-16 bg-blue-100/30 rounded-full filter blur-xl"></div>
+              <div className="flex flex-col h-full ">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 shadow-sm">
+                  <img
+                    src={PastOpeningLogo}
+                    alt="Past Applications"
+                    className="w-6 h-6 filter brightness-0 invert"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-2">
+                  Past Applications
+                </h3>
+                <p className="text-gray-500 text-sm mt-auto">
+                  Review your application history and outcomes
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          <Link to="/active-applications" className="group">
+            <div className="bg-white/95 backdrop-blur-xl hover:bg-white transition-all duration-300 rounded-2xl shadow-md hover:shadow-xl border border-gray-100 p-6 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden h-full">
+              <div className="absolute -right-4 -top-4 w-16 h-16 bg-green-100/30 rounded-full filter blur-xl"></div>
+              <div className="flex flex-col h-full">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 shadow-sm">
+                  <img
+                    src={ActiveLogo}
+                    alt="Active Applications"
+                    className="w-7 h-7 filter brightness-0 invert"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 group-hover:text-green-600 transition-colors mb-2">
+                  Active Applications
+                </h3>
+                <p className="text-gray-500 text-sm mt-auto">
+                  Track your ongoing applications and their status
+                </p>
+              </div>
+            </div>
+          </Link>
+
+          <Link to="/browse-companies" className="group">
+            <div className="bg-white/95 backdrop-blur-xl hover:bg-white transition-all duration-300 rounded-2xl shadow-md hover:shadow-xl border border-gray-100 p-6 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden h-full">
+              <div className="absolute -right-4 -top-4 w-16 h-16 bg-purple-100/30 rounded-full filter blur-xl"></div>
+              <div className="flex flex-col h-full">
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-700 rounded-xl flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300 shadow-sm">
+                  <img
+                    src={BrowseCompanyLogo}
+                    alt="Browse Companies"
+                    className="w-7 h-7 filter brightness-0 invert"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 group-hover:text-purple-600 transition-colors mb-2">
+                  Browse Companies
+                </h3>
+                <p className="text-gray-500 text-sm mt-auto">
+                  Explore potential employers and their opportunities
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
+        
+
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Explore Opportunities
+            </h2>
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <span>{jobs.length} opportunities available</span>
+            </div>
+          </div>
+          <p className="text-gray-600">
+            Discover amazing career opportunities that match your skills and interests.
+          </p>
+        </div>
       </div>
+
+      {loading && (
+        <div className="space-y-6">
+          {[...Array(3)].map((_, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl shadow-xs border border-gray-100 p-6 animate-pulse"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-100 rounded w-32 mb-3"></div>
+                  <div className="h-7 bg-gray-100 rounded w-3/4 mb-4"></div>
+                  <div className="space-y-2 mb-6">
+                    <div className="h-4 bg-gray-100 rounded w-full"></div>
+                    <div className="h-4 bg-gray-100 rounded w-5/6"></div>
+                  </div>
+                  <div className="h-9 bg-gray-100 rounded w-40"></div>
+                </div>
+                <div className="w-28 h-28 bg-gray-100 rounded-xl"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+
+      {!loading && error && (
+        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-xs">
+          <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-7 h-7 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Something went wrong
+          </h3>
+          <p className="text-gray-600 mb-5">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-gray-900 text-white px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+
+
+      {!loading && !error && dataLoaded && jobs.length > 0 && (
+        <div className="grid gap-6">
+          {jobs.map((job) => (
+            <JobCard key={job.id} job={job} />
+          ))}
+        </div>
+      )}
+
+  
+      {!loading && !error && dataLoaded && jobs.length === 0 && (
+        <div className="bg-white rounded-xl shadow-xs border border-gray-100 p-10 text-center">
+          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-5">
+            <svg
+              className="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"
+              />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            No opportunities available
+          </h3>
+          <p className="text-gray-500">
+            Check back later for new job openings and internships.
+          </p>
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
 };
 export default Student_Home;
