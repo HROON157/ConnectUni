@@ -1,13 +1,28 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import NavLink from "./NavLink";
-import { publicNavItems, studentNavItems, hrNavItems } from "../../Data/navData";
+import {
+  publicNavItems,
+  studentNavItems,
+  hrNavItems,
+} from "../../Data/navData";
 import { useAuth } from "../../Context/Context";
-import { HiOutlineChatBubbleLeftRight, HiOutlineUser, HiOutlineArrowRightOnRectangle } from "react-icons/hi2";
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import {
+  HiOutlineChatBubbleLeftRight,
+  HiOutlineUser,
+  HiOutlineArrowRightOnRectangle,
+} from "react-icons/hi2";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../Firebase/db";
+import "../../App.css";
+import OperaLogo from "../../assets/Logo.png";
 
-// Custom hook for media queries
 const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(false);
 
@@ -17,94 +32,118 @@ const useMediaQuery = (query) => {
       setMatches(media.matches);
     }
     const listener = () => setMatches(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
   }, [matches, query]);
 
   return matches;
 };
 
-// Profile Avatar Component (Memoized)
-const ProfileAvatar = React.memo(({ 
-  profilePic, 
-  initials, 
-  isLoading = false, 
-  size = "w-8 h-8", 
-  className = "" 
-}) => {
-  const [imageError, setImageError] = useState(false);
+const ProfileAvatar = React.memo(
+  ({
+    profilePic,
+    initials,
+    isLoading = false,
+    size = "w-8 h-8",
+    className = "",
+  }) => {
+    const [imageError, setImageError] = useState(false);
 
-  const handleImageError = useCallback(() => {
-    setImageError(true);
-  }, []);
+    const handleImageError = useCallback(() => {
+      setImageError(true);
+    }, []);
 
-  return (
-    <div className={`${size} rounded-full flex items-center justify-center overflow-hidden ${className} bg-gradient-to-r from-green-400 to-blue-500`}>
-      {isLoading ? (
-        <div className="w-full h-full bg-gradient-to-r from-gray-400 to-gray-500 animate-pulse" />
-      ) : profilePic && !imageError ? (
-        <img 
-          src={profilePic} 
-          alt="Profile" 
-          className="w-full h-full object-cover"
-          onError={handleImageError}
-          loading="lazy"
-        />
-      ) : (
-        <span className="text-white text-xs font-semibold">
-          {initials}
-        </span>
-      )}
-    </div>
-  );
-});
+    return (
+      <div
+        className={`${size} rounded-full flex items-center justify-center overflow-hidden ${className} bg-gradient-to-r from-green-400 to-blue-500`}
+      >
+        {isLoading ? (
+          <div className="w-full h-full bg-gradient-to-r from-gray-400 to-gray-500 animate-pulse" />
+        ) : profilePic && !imageError ? (
+          <img
+            src={profilePic}
+            alt="Profile"
+            className="w-full h-full object-cover"
+            onError={handleImageError}
+            loading="lazy"
+          />
+        ) : (
+          <span className="text-white text-xs font-semibold">{initials}</span>
+        )}
+      </div>
+    );
+  }
+);
 
-ProfileAvatar.displayName = 'ProfileAvatar';
+ProfileAvatar.displayName = "ProfileAvatar";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
-  
-  // State management
+
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
-  
-  // Refs
+
   const dropdownRef = useRef(null);
   const mobileDropdownRef = useRef(null);
   const unsubscribeRef = useRef(null);
-  
-  // Media query hook
-  const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Memoized values
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   const navItems = useMemo(() => {
     if (!isAuthenticated) return publicNavItems;
-    if (user?.role === 'student') return studentNavItems;
-    if (user?.role === 'hr') return hrNavItems;
+    if (user?.role === "student") return studentNavItems;
+    if (user?.role === "hr") return hrNavItems;
     return publicNavItems;
   }, [isAuthenticated, user?.role]);
 
   const userInitials = useMemo(() => {
-    const name = profileData?.name || profileData?.profileName || user?.name || user?.profileName || 'User';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  }, [profileData?.name, profileData?.profileName, user?.name, user?.profileName]);
+    const name =
+      profileData?.name ||
+      profileData?.profileName ||
+      user?.name ||
+      user?.profileName ||
+      "User";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  }, [
+    profileData?.name,
+    profileData?.profileName,
+    user?.name,
+    user?.profileName,
+  ]);
 
   const userName = useMemo(() => {
-    return profileData?.name || profileData?.profileName || user?.name || user?.profileName || 'User';
-  }, [profileData?.name, profileData?.profileName, user?.name, user?.profileName]);
+    return (
+      profileData?.name ||
+      profileData?.profileName ||
+      user?.name ||
+      user?.profileName ||
+      "User"
+    );
+  }, [
+    profileData?.name,
+    profileData?.profileName,
+    user?.name,
+    user?.profileName,
+  ]);
 
   const dashboardPath = useMemo(() => {
-    return user?.role === 'student' ? '/student-dashboard' : '/hr-dashboard';
+    return user?.role === "student" ? "/student-dashboard" : "/hr-dashboard";
   }, [user?.role]);
 
   const profilePath = useMemo(() => {
-    return user?.role === 'student' ? '/student-profile' : '/hr-profile';
+    return user?.role === "student" ? "/student-profile" : "/hr-profile";
   }, [user?.role]);
 
-  // Optimized profile data fetching with real-time updates
   const setupProfileListener = useCallback(async () => {
     if (!user?.uid || !isAuthenticated) {
       setProfileData(null);
@@ -113,38 +152,39 @@ const Navbar = () => {
 
     try {
       setProfileLoading(true);
-      
-      // Clean up previous listener
+
+
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
       }
 
-      const collectionName = user.role === 'student' ? 'studentProfiles' : 'hrProfiles';
+      const collectionName =
+        user.role === "student" ? "studentProfiles" : "hrProfiles";
       const docRef = doc(db, collectionName, user.uid);
-
-      // Set up real-time listener
-      unsubscribeRef.current = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setProfileData(docSnap.data());
-        } else {
-          setProfileData(null);
+      unsubscribeRef.current = onSnapshot(
+        docRef,
+        (docSnap) => {
+          if (docSnap.exists()) {
+            setProfileData(docSnap.data());
+          } else {
+            setProfileData(null);
+          }
+          setProfileLoading(false);
+        },
+        (error) => {
+          
+          setProfileLoading(false);
         }
-        setProfileLoading(false);
-      }, (error) => {
-        console.error('Error listening to profile data:', error);
-        setProfileLoading(false);
-      });
-
+      );
     } catch (error) {
-      console.error('Error setting up profile listener:', error);
       setProfileLoading(false);
     }
   }, [user?.uid, user?.role, isAuthenticated]);
 
-  // Effects
+  
   useEffect(() => {
     setupProfileListener();
-    
+
     return () => {
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
@@ -152,26 +192,25 @@ const Navbar = () => {
     };
   }, [setupProfileListener]);
 
-  // Optimized click outside handler
-  // Optimized click outside handler
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    const isInsideDesktop = dropdownRef.current?.contains(event.target);
-    const isInsideMobile = mobileDropdownRef.current?.contains(event.target);
-    
-    // Only close if clicking outside both dropdowns
-    if (!isInsideDesktop && !isInsideMobile) {
-      setIsProfileDropdownOpen(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const isInsideDesktop = dropdownRef.current?.contains(event.target);
+      const isInsideMobile = mobileDropdownRef.current?.contains(event.target);
+
+      if (!isInsideDesktop && !isInsideMobile) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    if (isProfileDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
-  };
+  }, [isProfileDropdownOpen]);
 
-  if (isProfileDropdownOpen) {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }
-}, [isProfileDropdownOpen]);
 
-  // Memoized event handlers
   const handleAuthAction = useCallback(() => {
     if (isAuthenticated) {
       logout();
@@ -183,15 +222,18 @@ useEffect(() => {
     setIsProfileDropdownOpen(false);
   }, [isAuthenticated, logout, navigate]);
 
-  const handleProfileClick = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (isMobile) {
-      setIsMenuOpen(false);
-    }
-    setIsProfileDropdownOpen(prev => !prev);
-  }, [isMobile]);
+  const handleProfileClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (isMobile) {
+        setIsMenuOpen(false);
+      }
+      setIsProfileDropdownOpen((prev) => !prev);
+    },
+    [isMobile]
+  );
 
   const handleViewProfile = useCallback(() => {
     navigate(profilePath);
@@ -200,13 +242,13 @@ useEffect(() => {
   }, [navigate, profilePath]);
 
   const handleMessagesClick = useCallback(() => {
-    navigate('/messages');
+    navigate("/messages");
     setIsProfileDropdownOpen(false);
     setIsMenuOpen(false);
   }, [navigate]);
 
   const toggleMenu = useCallback(() => {
-    setIsMenuOpen(prev => !prev);
+    setIsMenuOpen((prev) => !prev);
     if (isProfileDropdownOpen) {
       setIsProfileDropdownOpen(false);
     }
@@ -216,22 +258,30 @@ useEffect(() => {
     setIsMenuOpen(false);
   }, []);
 
-  const handleMobileProfileClick = useCallback((e) => {
-    e.stopPropagation();
-    handleProfileClick(e);
-  }, [handleProfileClick]);
+  const handleMobileProfileClick = useCallback(
+    (e) => {
+      e.stopPropagation();
+      handleProfileClick(e);
+    },
+    [handleProfileClick]
+  );
 
-  const handleMobileViewProfile = useCallback((e) => {
-    e.stopPropagation();
-    handleViewProfile();
-  }, [handleViewProfile]);
+  const handleMobileViewProfile = useCallback(
+    (e) => {
+      e.stopPropagation();
+      handleViewProfile();
+    },
+    [handleViewProfile]
+  );
 
-  const handleMobileAuthAction = useCallback((e) => {
-    e.stopPropagation();
-    handleAuthAction();
-  }, [handleAuthAction]);
+  const handleMobileAuthAction = useCallback(
+    (e) => {
+      e.stopPropagation();
+      handleAuthAction();
+    },
+    [handleAuthAction]
+  );
 
-  // Prevent unnecessary re-renders
   const stopPropagation = useCallback((e) => {
     e.stopPropagation();
   }, []);
@@ -240,7 +290,7 @@ useEffect(() => {
     <nav className="w-full bg-gradient-to-br from-gray-800/95 via-gray-900/95 to-indigo-900/95 backdrop-blur-lg border-b border-gray-800/50 sticky top-0 z-[9999] shadow-lg transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo Section */}
+
           <div className="flex-shrink-0 flex items-center space-x-8">
             <Link
               to="/"
@@ -248,14 +298,24 @@ useEffect(() => {
               onClick={closeMenu}
             >
               <div className="relative">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-sm sm:text-base">CU</span>
+                <div className="flex items-center justify-center">
+               
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center  overflow-hidden">
+                    <img
+                      src={OperaLogo}
+                      alt="Logo"
+                      className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-contain"
+                    />
+                  </div>
                 </div>
+
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-400 via-purple-500 to-indigo-500 rounded-full opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-300" />
               </div>
-              <span className="text-gray-200 font-bold text-lg sm:text-xl tracking-tight group-hover:text-indigo-400 transition-colors">
-                ConnectUni
-              </span>
+              <div className="flex flex-col font-giza">
+                <span className="text-gray-200  text-lg sm:text-xl  group-hover:text-indigo-400 transition-colors">
+                  Optera
+                </span>
+              </div>
             </Link>
 
             {isAuthenticated && (
@@ -269,15 +329,15 @@ useEffect(() => {
             )}
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map(({ path, label }) => (
-              label !== "Dashboard" && (
-                <NavLink key={path} to={path} mobile={false}>
-                  {label}
-                </NavLink>
-              )
-            ))}
+            {navItems.map(
+              ({ path, label }) =>
+                label !== "Dashboard" && (
+                  <NavLink key={path} to={path} mobile={false}>
+                    {label}
+                  </NavLink>
+                )
+            )}
 
             {isAuthenticated && (
               <button
@@ -290,7 +350,7 @@ useEffect(() => {
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs flex items-center justify-center" />
               </button>
             )}
-            
+
             {isAuthenticated ? (
               <div className="relative z-50" ref={dropdownRef}>
                 <button
@@ -301,7 +361,7 @@ useEffect(() => {
                   aria-haspopup="true"
                   aria-label="User menu"
                 >
-                  <ProfileAvatar 
+                  <ProfileAvatar
                     profilePic={profileData?.profilePic}
                     initials={userInitials}
                     isLoading={profileLoading}
@@ -311,29 +371,34 @@ useEffect(() => {
                   </span>
                   <svg
                     className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                      isProfileDropdownOpen ? 'rotate-180' : ''
+                      isProfileDropdownOpen ? "rotate-180" : ""
                     }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
 
-                {/* Desktop Dropdown Menu */}
+               
                 {isProfileDropdownOpen && (
-                  <div 
+                  <div
                     className="absolute right-0 top-full mt-2 w-64 bg-gradient-to-br from-gray-800 to-indigo-700 backdrop-blur-xl rounded-xl shadow-2xl border border-gray-700/50 py-2 z-[9999] transform transition-all duration-200 scale-100 opacity-100"
                     role="menu"
                     aria-orientation="vertical"
                   >
-                    {/* User Info Header */}
+                   
                     <div className="px-4 py-3 border-b border-gray-700/50">
                       <div className="flex items-center space-x-3">
-                        <ProfileAvatar 
-                          size="w-12 h-12" 
+                        <ProfileAvatar
+                          size="w-12 h-12"
                           profilePic={profileData?.profilePic}
                           initials={userInitials}
                           isLoading={profileLoading}
@@ -348,14 +413,13 @@ useEffect(() => {
                             </p>
                           )}
                           <p className="text-sm text-gray-400 capitalize">
-                            {profileData?.company || user?.role || 'User'}
+                            {profileData?.company || user?.role || "User"}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Menu Items */}
-                    <div className="py-1" role="none">
+                      <div className="py-1" role="none">
                       <button
                         onClick={handleViewProfile}
                         className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800/50 cursor-pointer flex items-center space-x-3 transition-colors focus:outline-none focus:bg-gray-800/50"
@@ -382,14 +446,14 @@ useEffect(() => {
             ) : (
               <button
                 onClick={handleAuthAction}
-                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full hover:from-blue-600 hover:to-purple-600 font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-6 py-2 cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full hover:from-blue-600 hover:to-purple-600 font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Login
               </button>
             )}
           </div>
 
-          {/* Mobile Controls */}
+    
           <div className="md:hidden flex items-center space-x-2">
             {isAuthenticated ? (
               <>
@@ -408,7 +472,7 @@ useEffect(() => {
                   type="button"
                   aria-label="User profile"
                 >
-                  <ProfileAvatar 
+                  <ProfileAvatar
                     profilePic={profileData?.profilePic}
                     initials={userInitials}
                     isLoading={profileLoading}
@@ -418,12 +482,12 @@ useEffect(() => {
             ) : (
               <button
                 onClick={handleAuthAction}
-                className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium transition-all duration-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 cursor-pointer bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium transition-all duration-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Login
               </button>
             )}
-            
+
             <button
               onClick={toggleMenu}
               className="px-3 py-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gradient-to-r from-blue-500 to-purple-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -432,17 +496,33 @@ useEffect(() => {
             >
               <span className="sr-only">Toggle menu</span>
               <div className="w-6 h-6 flex flex-col justify-center items-center">
-                <span className={`block w-5 h-0.5 bg-current transform transition duration-300 ${isMenuOpen ? "rotate-45 translate-y-1.5" : ""}`} />
-                <span className={`block w-5 h-0.5 bg-current transform transition duration-300 mt-1 ${isMenuOpen ? "opacity-0" : ""}`} />
-                <span className={`block w-5 h-0.5 bg-current transform transition duration-300 mt-1 ${isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""}`} />
+                <span
+                  className={`block w-5 h-0.5 bg-current transform transition duration-300 ${
+                    isMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                  }`}
+                />
+                <span
+                  className={`block w-5 h-0.5 bg-current transform transition duration-300 mt-1 ${
+                    isMenuOpen ? "opacity-0" : ""
+                  }`}
+                />
+                <span
+                  className={`block w-5 h-0.5 bg-current transform transition duration-300 mt-1 ${
+                    isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                  }`}
+                />
               </div>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
-      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
+  
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
         <div className="px-4 pt-2 pb-3 space-y-1 border-t border-gray-700">
           {navItems.map(({ path, label }) => (
             <NavLink key={path} to={path} mobile={true} onClick={closeMenu}>
@@ -452,18 +532,18 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Mobile Profile Dropdown */}
+    
       {isAuthenticated && isProfileDropdownOpen && (
-        <div 
+        <div
           ref={mobileDropdownRef}
           className="md:hidden bg-gradient-to-br from-blue-500 to-purple-900 border-t border-gray-700 relative z-[9999]"
           onClick={stopPropagation}
         >
           <div className="px-4 py-3 space-y-2">
-            {/* Mobile User Info */}
+    
             <div className="flex items-center space-x-3 px-3 py-2">
-              <ProfileAvatar 
-                size="w-10 h-10" 
+              <ProfileAvatar
+                size="w-10 h-10"
                 profilePic={profileData?.profilePic}
                 initials={userInitials}
                 isLoading={profileLoading}
@@ -473,16 +553,16 @@ useEffect(() => {
                   {userName}
                 </p>
                 <p className="text-sm text-gray-400 truncate">
-                  {profileData?.title || user?.role || 'Role'}
+                  {profileData?.title || user?.role || "Role"}
                 </p>
                 <p className="text-xs text-gray-400 capitalize">
-                  {profileData?.company || 'Company'}
+                  {profileData?.company || "Company"}
                 </p>
               </div>
             </div>
-            
+
             <div className="border-t border-gray-700" />
-            
+
             <button
               onClick={handleMobileViewProfile}
               className="w-full text-left flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:bg-gray-700"
@@ -490,7 +570,7 @@ useEffect(() => {
               <HiOutlineUser className="w-4 h-4" />
               <span>View Profile</span>
             </button>
-            
+
             <button
               onClick={handleMobileAuthAction}
               className="w-full text-left flex items-center space-x-3 px-3 py-2 text-red-400 hover:text-red-300 hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:bg-gray-700"

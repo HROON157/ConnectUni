@@ -7,7 +7,7 @@ import { useAuth } from "../Context/Context";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../Firebase/db";
 import "react-toastify/dist/ReactToastify.css";
-
+import OpteraLogo from "../assets/Logo.png"
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -23,7 +23,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Optimized profile completion check - run in parallel
+  
   const checkProfileCompletion = async (userId, role) => {
     try {
       const collectionName = role === 'student' ? 'studentProfiles' : 'hrProfiles';
@@ -37,7 +37,7 @@ const Login = () => {
       const profileData = profileSnap.data();
       
       if (role === 'hr') {
-        // Quick HR profile check - only essential fields
+      
         return !!(
           profileData.name && 
           profileData.company && 
@@ -45,7 +45,7 @@ const Login = () => {
           profileData.title
         );
       } else {
-        // Quick student profile check - only essential fields
+    
         return !!(
           profileData.name && 
           profileData.university && 
@@ -54,7 +54,7 @@ const Login = () => {
         );
       }
     } catch (error) {
-      console.error('Error checking profile completion:', error);
+
       return false;
     }
   };
@@ -79,13 +79,12 @@ const Login = () => {
     const loadingToastId = toast.loading("Signing you in...");
 
     try {
-      // Start sign-in process
+
       const signInPromise = signIn(formData.email, formData.password);
       
       const result = await signInPromise;
       const { userData, user } = result;
-      
-      // Login user immediately
+   
       login({
         role: userData.role,
         name: userData.profileName,
@@ -93,14 +92,12 @@ const Login = () => {
         uid: user.uid
       });
       
-      // Start profile check in parallel with navigation
+    
       const profileCheckPromise = checkProfileCompletion(user.uid, userData.role);
       
-      // Dismiss loading toast immediately
+
       toast.dismiss(loadingToastId);
-      // toast.success(`Welcome back, ${userData.profileName}!`);
-      
-      // Determine navigation path
+  
       let navigationPath;
       if (userData.role === 'student') {
         navigationPath = '/student-dashboard';
@@ -109,8 +106,7 @@ const Login = () => {
       } else {
         navigationPath = '/dashboard';
       }
-      
-      // Check profile completion and navigate accordingly
+
       const isProfileComplete = await profileCheckPromise;
       
       if (userData.role === 'student' && !isProfileComplete) {
@@ -119,15 +115,14 @@ const Login = () => {
         navigationPath = '/hr-profile';
       }
       
-      // Navigate immediately - no artificial delay
+      
       navigate(navigationPath);
       
     } catch (error) {
-      console.error("Login error:", error);
+
       
       toast.dismiss(loadingToastId);
-      
-      // Simplified error handling for faster response
+
       let errorMessage = "Login failed. Please try again.";
       
       switch (error.code) {
@@ -163,23 +158,28 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Optimized animated background - reduced complexity */}
+    
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-gradient-to-r from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-6 sm:p-8 transition-all duration-300">
-        {/* Logo Section */}
+     
         <div className="flex items-center justify-center mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">CU</span>
-            </div>
-            <span className="text-gray-800 font-bold text-2xl tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              ConnectUni
-            </span>
-          </div>
+          <div className="flex items-center space-x-1">
+
+  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center  overflow-hidden">
+    <img 
+      src={OpteraLogo} 
+      alt="Logo" 
+      className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-contain"
+    />
+  </div>
+  <span className="text-gray-800 font-bold text-xl sm:text-2xl font-giza bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    Optera
+  </span>
+</div>
         </div>
 
         <div className="mb-6">
@@ -192,7 +192,7 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email Input */}
+   
           <div className="relative">
             <input
               type="email"
@@ -221,7 +221,7 @@ const Login = () => {
             </label>
           </div>
 
-          {/* Password Input */}
+   
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -266,18 +266,18 @@ const Login = () => {
             </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 space-y-3 sm:space-y-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between  pt-2 space-y-3 sm:space-y-0">
             <button
               type="submit"
               disabled={loading}
-              className={`relative overflow-hidden w-full sm:w-auto font-medium py-3 px-8 rounded-full transition-all duration-200 text-sm shadow-lg ${
+              className={`relative overflow-hidden cursor-pointer w-full sm:w-auto font-medium py-3 px-8 rounded-full transition-all duration-200 text-sm shadow-lg ${
                 loading
                   ? 'bg-gray-300 cursor-not-allowed text-gray-500'
                   : 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 hover:shadow-blue-500/30'
               }`}
             >
               {loading ? (
-                <span className="flex items-center justify-center">
+                <span className="flex items-center  justify-center">
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -307,7 +307,7 @@ const Login = () => {
 
         <div className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 rounded-xl p-4 border border-blue-100/50">
           <p className="text-sm text-gray-700 mb-3 leading-relaxed">
-            Not a member? Join ConnectUni to access exclusive features and connect with your university community.
+            Not a member? Join Optera to access exclusive features and connect with your university community.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link

@@ -81,13 +81,7 @@ const New_Openings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const currentUser = auth.currentUser;
-    console.log("🔍 Authentication Debug:");
-    console.log("Current user:", currentUser);
-    console.log("Is authenticated:", !!currentUser);
-    console.log("User UID:", currentUser?.uid);
-    console.log("User email:", currentUser?.email);
-    
+    const currentUser = auth.currentUser;    
     if (!currentUser) {
       toast.error("❌ Please log in to create job openings.");
       return;
@@ -104,16 +98,12 @@ const New_Openings = () => {
       const jobData = {
         ...formData,
         status: 'active',
-        // postedBy: currentUser.uid,
-        // postedByEmail: currentUser.email,
         applicationsCount: 0
       };
       
-      console.log("📝 Sending job data:", jobData);
 
       const jobId = await createJobOpening(jobData, currentUser.uid);
-      console.log("✅ Job Opening created with ID:", jobId);
-
+  
       toast.success("🎉 Job opening created successfully!", {
         position: "top-right",
         autoClose: 3000,
@@ -138,10 +128,6 @@ const New_Openings = () => {
       }, 2000);
       
     } catch (error) {
-      console.error("❌ Error creating job opening:", error);
-      console.error("Error code:", error.code);
-      console.error("Error message:", error.message);
-      
       if (error.code === 'permission-denied') {
         toast.error("❌ Permission denied. Please check your account permissions.", {
           position: "top-right",
@@ -162,7 +148,7 @@ const New_Openings = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 py-4 sm:py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
+        
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-4 lg:space-y-0">
             <div className="flex items-center space-x-3">
@@ -205,7 +191,6 @@ const New_Openings = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form Section */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center" style={{ fontFamily: "Public Sans" }}>
@@ -214,7 +199,6 @@ const New_Openings = () => {
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Job Title */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
                     <HiOutlineBriefcase className="w-4 h-4 inline mr-1" />
@@ -239,7 +223,6 @@ const New_Openings = () => {
                   )}
                 </div>
 
-                {/* Job Description */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
                     <HiOutlineDocumentText className="w-4 h-4 inline mr-1" />
@@ -263,10 +246,7 @@ const New_Openings = () => {
                     </p>
                   )}
                 </div>
-
-                {/* Type and Compensation Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Job Type */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
                       Job Type *
@@ -293,8 +273,6 @@ const New_Openings = () => {
                       </p>
                     )}
                   </div>
-
-                  {/* Compensation */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
                       <HiOutlineCurrencyDollar className="w-4 h-4 inline mr-1" />
@@ -322,8 +300,6 @@ const New_Openings = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Pay Range */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
                     <HiOutlineCurrencyDollar className="w-4 h-4 inline mr-1" />
@@ -339,8 +315,6 @@ const New_Openings = () => {
                     style={{ fontFamily: "Public Sans" }}
                   />
                 </div>
-
-                {/* Location */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
                     <HiOutlineMapPin className="w-4 h-4 inline mr-1" />
@@ -365,7 +339,6 @@ const New_Openings = () => {
                   )}
                 </div>
 
-                {/* Requirements */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "Public Sans" }}>
                     <HiOutlineClipboardDocumentList className="w-4 h-4 inline mr-1" />
@@ -390,7 +363,6 @@ const New_Openings = () => {
                   )}
                 </div>
 
-                {/* Submit Button */}
                 <div className="pt-6">
                   <button
                     type="submit"
@@ -419,7 +391,6 @@ const New_Openings = () => {
             </div>
           </div>
 
-          {/* Guidelines Section */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sticky top-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center" style={{ fontFamily: "Public Sans" }}>
@@ -484,7 +455,6 @@ const New_Openings = () => {
                 ))}
               </div>
 
-              {/* Quick Tips */}
               <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
   <h4 className="font-semibold text-blue-900 mb-2 flex items-center" style={{ fontFamily: "Public Sans" }}>
     <img src={idea} alt="Pro Tips" className="w-4 h-4 mr-1 filter brightness-0" />

@@ -17,11 +17,11 @@ const BNU_Profile = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Fetch BNU students from Firebase
+
   const fetchBNUStudents = async () => {
     setLoading(true);
     try {
-      // First, get students from the 'students' collection where university is BNU
+      
       const studentsQuery = query(
         collection(db, "students"),
         where("university", "==", "BNU")
@@ -33,7 +33,7 @@ const BNU_Profile = () => {
         studentIds.push(doc.id);
       });
 
-      // Then, get their profiles from 'studentProfiles' collection
+       collection
       const profiles = [];
       if (studentIds.length > 0) {
         const profilesCollection = collection(db, "studentProfiles");
@@ -41,8 +41,7 @@ const BNU_Profile = () => {
         
         profilesSnapshot.forEach((doc) => {
           const profileData = doc.data();
-          // Check if this profile belongs to a BNU student
-          if (studentIds.includes(doc.id) || profileData.university?.toLowerCase().includes("bnu")) {
+                    if (studentIds.includes(doc.id) || profileData.university?.toLowerCase().includes("bnu")) {
             profiles.push({
               id: doc.id,
               ...profileData
@@ -53,13 +52,12 @@ const BNU_Profile = () => {
 
       setBnuStudents(profiles);
     } catch (error) {
-      console.error("Error fetching BNU students:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch students when component mounts or when students tab is selected
+
   useEffect(() => {
     if (activeTab === "students") {
       fetchBNUStudents();
@@ -87,8 +85,7 @@ const BNU_Profile = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-2 xs:py-4 sm:py-8 px-1 xs:px-2 sm:px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header Section */}
-        <div className="bg-white rounded-lg xs:rounded-xl sm:rounded-2xl shadow-lg p-3 xs:p-4 sm:p-8 mb-3 xs:mb-4 sm:mb-8">
+             <div className="bg-white rounded-lg xs:rounded-xl sm:rounded-2xl shadow-lg p-3 xs:p-4 sm:p-8 mb-3 xs:mb-4 sm:mb-8">
           <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left gap-3 xs:gap-4 sm:gap-6">
             <div className="relative flex-shrink-0">
               <img
@@ -139,8 +136,7 @@ const BNU_Profile = () => {
                 </div>
               </div>
 
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 xs:gap-2 sm:gap-4 mt-3 xs:mt-4 sm:mt-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 xs:gap-2 sm:gap-4 mt-3 xs:mt-4 sm:mt-6">
                 <div className="text-center p-1.5 xs:p-2 sm:p-3 bg-gray-50 rounded-md xs:rounded-lg">
                   <div className="text-base xs:text-lg sm:text-2xl font-bold text-blue-600">40%</div>
                   <div className="text-xs sm:text-sm text-gray-600">Scholarships</div>
@@ -162,8 +158,7 @@ const BNU_Profile = () => {
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="bg-white rounded-lg xs:rounded-xl shadow-lg mb-3 xs:mb-4 sm:mb-8">
+              <div className="bg-white rounded-lg xs:rounded-xl shadow-lg mb-3 xs:mb-4 sm:mb-8">
           <div className="flex border-b border-gray-200">
             <button 
               onClick={() => setActiveTab("about")}
@@ -188,12 +183,10 @@ const BNU_Profile = () => {
           </div>
         </div>
 
-        {/* Content Sections */}
-        <div className="space-y-3 xs:space-y-4 sm:space-y-8">
+               <div className="space-y-3 xs:space-y-4 sm:space-y-8">
           {activeTab === "about" && (
             <>
-              {/* Overview Section */}
-              <div className="bg-white rounded-lg xs:rounded-xl shadow-lg p-3 xs:p-4 sm:p-8">
+                           <div className="bg-white rounded-lg xs:rounded-xl shadow-lg p-3 xs:p-4 sm:p-8">
                 <h2 className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 mb-3 xs:mb-4 sm:mb-6 font-['Public_Sans'] flex items-center gap-1 xs:gap-2">
                   <img src={SearchLogo} alt="Overview" className="w-4 h-4 xs:w-4 xs:h-4" />
                   Overview
@@ -220,8 +213,7 @@ const BNU_Profile = () => {
                 </div>
               </div>
 
-              {/* Mission Section */}
-              <div className="bg-white rounded-lg xs:rounded-xl shadow-lg p-3 xs:p-4 sm:p-8">
+                          <div className="bg-white rounded-lg xs:rounded-xl shadow-lg p-3 xs:p-4 sm:p-8">
                 <h2 className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 mb-3 xs:mb-4 sm:mb-6 font-['Public_Sans'] flex items-center gap-1 xs:gap-2">
                   <img src={MissionLogo} alt="Mission" className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" />
                   Mission
@@ -236,8 +228,7 @@ const BNU_Profile = () => {
                 </div>
               </div>
 
-              {/* Schools Section */}
-              <div className="bg-white rounded-lg xs:rounded-xl shadow-lg p-3 xs:p-4 sm:p-8">
+                          <div className="bg-white rounded-lg xs:rounded-xl shadow-lg p-3 xs:p-4 sm:p-8">
                 <h2 className="text-lg xs:text-xl sm:text-2xl font-bold text-gray-900 mb-3 xs:mb-4 sm:mb-6 font-['Public_Sans'] flex items-center gap-1 xs:gap-2">
                   <img
                     src={EducationLogo}
@@ -291,9 +282,9 @@ const BNU_Profile = () => {
                       key={student.id}
                       className="flex items-center justify-between p-2 xs:p-3 sm:p-4 border border-gray-200 rounded-lg xs:rounded-xl hover:shadow-md hover:border-blue-300 transition-all duration-200 bg-white"
                     >
-                      {/* Left side - Profile info */}
+                      
                       <div className="flex items-center space-x-2 xs:space-x-3 sm:space-x-4 flex-1 min-w-0">
-                        {/* Profile Picture */}
+                      
                         <div className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-gray-200 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0">
                           {student.profilePic ? (
                             <img
@@ -314,7 +305,7 @@ const BNU_Profile = () => {
                           )}
                         </div>
                         
-                        {/* Student Info */}
+                        
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-gray-900 text-sm xs:text-base sm:text-lg font-['Public_Sans'] truncate">
                             {student.name || "Anonymous Student"}
@@ -325,13 +316,13 @@ const BNU_Profile = () => {
                         </div>
                       </div>
                       
-                      {/* Right side - View Profile Button */}
+                    
                       <button
                         onClick={() => handleViewProfile(student)}
-                        className="px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-md xs:rounded-lg text-white transition-colors duration-200 font-medium text-xs sm:text-sm font-['Public_Sans'] flex-shrink-0 ml-2 xs:ml-3"
+                        className="px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-indigo-600 cursor-pointer rounded-md xs:rounded-lg text-white transition-colors duration-200 font-medium text-xs sm:text-sm font-['Public_Sans'] flex-shrink-0 ml-2 xs:ml-3"
                       >
                         <span className="">View Profile</span>
-                        {/* <span className="">View</span> */}
+                        
                       </button>
                     </div>
                   ))}
@@ -349,11 +340,11 @@ const BNU_Profile = () => {
           )}
         </div>
 
-        {/* Student Profile Modal */}
+ 
         {showModal && selectedStudent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-1 xs:p-2 sm:p-4">
             <div className="bg-white rounded-lg xs:rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[98vh] xs:max-h-[95vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl">
-              {/* Modal Header with Close Button */}
+         
               <div className="sticky top-0 mt-5 bg-white border-b border-gray-200 p-3 xs:p-4 sm:p-6 rounded-t-lg xs:rounded-t-xl sm:rounded-t-2xl z-10">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base xs:text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 font-['Public_Sans']">
@@ -372,10 +363,10 @@ const BNU_Profile = () => {
                 </div>
               </div>
               
-              {/* Modal Content */}
+
               <div className="p-3 xs:p-4 sm:p-6">
                 <div className="text-center mb-3 xs:mb-4 sm:mb-6">
-                  {/* Profile Picture */}
+      
                   <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 rounded-full mx-auto mb-2 xs:mb-3 sm:mb-4 border-4 border-blue-100 shadow-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     {selectedStudent.profilePic ? (
                       <img
@@ -406,7 +397,6 @@ const BNU_Profile = () => {
                   </p>
                 </div>
 
-                {/* Bio */}
                 {selectedStudent.bio && (
                   <div className="mb-3 xs:mb-4 sm:mb-6">
                     <h4 className="font-semibold text-gray-900 mb-2 font-['Public_Sans'] text-xs xs:text-sm sm:text-base">About</h4>
@@ -414,7 +404,7 @@ const BNU_Profile = () => {
                   </div>
                 )}
 
-                {/* Contact Info */}
+          
                 <div className="border-t border-gray-200 pt-3 xs:pt-4 sm:pt-6">
                   <h4 className="font-semibold text-gray-900 mb-2 xs:mb-3 font-['Public_Sans'] text-xs xs:text-sm sm:text-base">Contact & Links</h4>
                   <div className="space-y-2 xs:space-y-3">

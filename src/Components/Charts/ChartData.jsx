@@ -1,12 +1,9 @@
 export const getDashboardData = async () => {
   try {
-    // Replace with your actual API endpoint
     const response = await fetch('/api/dashboard-stats');
     const data = await response.json();
     return data;
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-   
+  } catch (error) {   
     return getMockData();
   }
 };

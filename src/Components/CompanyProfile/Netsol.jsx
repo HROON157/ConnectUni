@@ -92,10 +92,10 @@ const Netsol = () => {
   return (
     <div className="min-h-screen bg-[#f7fafc] px-4 py-8 sm:py-12">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+        
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 bg-gradient-to-r from-gray-800 via-purple-800 to-indigo-800 bg-clip-text text-transparent tracking-tight">
               Company Profile
             </h1>
             <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
@@ -107,7 +107,7 @@ const Netsol = () => {
           </p>
         </div>
 
-        {/* Company Card */}
+        
         <div className="flex flex-col sm:flex-row gap-6 bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-200 hover:shadow-md transition duration-200">
           <div className="flex-shrink-0">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden">
@@ -152,15 +152,15 @@ const Netsol = () => {
           </div>
         </div>
 
-        {/* Tabs */}
+   
         <div className="flex border-b border-gray-200 mb-8">
           {tabs.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setActiveTab(tab.value)}
-              className={`px-4 py-3 -mb-px font-medium text-sm sm:text-base transition-all ${
+              className={`px-4 py-3 -mb-px font-medium cursor-pointer text-sm sm:text-base transition-all ${
                 activeTab === tab.value
-                  ? "border-b-2 border-blue-600 text-blue-700 font-semibold"
+                  ? "border-b-2 border-blue-600 text-blue-700  font-semibold"
                   : "text-gray-500 hover:text-blue-600"
               }`}
             >
@@ -169,10 +169,10 @@ const Netsol = () => {
           ))}
         </div>
 
-        {/* Tab Content */}
+       
         {activeTab === "about" && (
           <div className="space-y-6">
-            {/* Overview */}
+            
             <section className="bg-white p-6 rounded-lg border border-gray-200">
               <div className="flex items-center mb-4">
                 <div className="w-1 h-6 bg-blue-600 rounded-full mr-3"></div>
@@ -183,7 +183,7 @@ const Netsol = () => {
               </p>
             </section>
 
-            {/* Mission & Vision */}
+            
             <div className="grid md:grid-cols-2 gap-6">
               <section className="bg-white p-6 rounded-lg border border-gray-200">
                 <div className="flex items-center mb-4">
@@ -205,7 +205,7 @@ const Netsol = () => {
               </section>
             </div>
 
-            {/* Values */}
+    
             <section className="bg-white p-6 rounded-lg border border-gray-200">
               <div className="flex items-center mb-4">
                 <div className="w-1 h-6 bg-blue-600 rounded-full mr-3"></div>

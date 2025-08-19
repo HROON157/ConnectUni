@@ -17,7 +17,7 @@ const Home = () => {
           >
             Welcome to{" "}
             <span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
-              ConnectUni
+            Optera
             </span>
           </motion.h1>
 

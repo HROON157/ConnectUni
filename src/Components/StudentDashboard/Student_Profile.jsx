@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EducationLogo from "../../assets/education.png"
-// Custom hook for debouncing
+
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -21,7 +21,7 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
-// Toast configurations
+
 const toastConfig = {
   position: "top-right",
   autoClose: 3000,
@@ -64,7 +64,7 @@ const Student_Profile = () => {
     about: "",
   });
 
-  // Validation states
+
   const [validationErrors, setValidationErrors] = useState({});
   const [showValidation, setShowValidation] = useState(false);
 
@@ -75,10 +75,9 @@ const Student_Profile = () => {
     resume: false,
   });
 
-  // Debounce edit data to prevent excessive re-renders
+ 
   const debouncedEditData = useDebounce(editData, 300);
 
-  // Validation functions - ALL FIELDS COMPULSORY
   const validateField = useCallback((name, value) => {
     const errors = {};
 
@@ -178,7 +177,7 @@ const Student_Profile = () => {
           if (!isGitHubUrl) {
             errors.github = "Please enter a GitHub URL";
           }
-          // Remove the complex regex validation that was causing issues
+
         }
         break;
 
@@ -199,7 +198,7 @@ const Student_Profile = () => {
           typeof value === "string" &&
           value.startsWith("data:image/")
         ) {
-          // Valid base64 image
+
         } else {
           errors.profilePic = "Invalid profile picture format";
         }
@@ -212,7 +211,7 @@ const Student_Profile = () => {
           typeof value === "string" &&
           value.startsWith("data:application/pdf")
         ) {
-          // Valid base64 PDF
+
         } else {
           errors.resume = "Invalid resume format (PDF only)";
         }
@@ -250,19 +249,18 @@ const Student_Profile = () => {
     [validateField]
   );
 
-  // Check if form is valid
+ 
   const isFormValid = useMemo(() => {
     const errors = validateAllFields(editData);
     return Object.keys(errors).length === 0;
   }, [editData, validateAllFields]);
 
-  // Update validation errors separately
   useEffect(() => {
     const errors = validateAllFields(editData);
     setValidationErrors(errors);
   }, [editData, validateAllFields]);
 
-  // Clear user data function
+
   const clearUserData = useCallback(() => {
     const defaultData = {
       name: "",
@@ -292,7 +290,7 @@ const Student_Profile = () => {
     }
 
     try {
-      // Create a blob from the base64 data
+
       const base64Response = fetch(profileData.resume);
       base64Response
         .then((res) => res.blob())
@@ -305,15 +303,14 @@ const Student_Profile = () => {
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
-        //   toast.success("Resume downloaded successfully!");
+
         });
     } catch (error) {
-      console.error("Error downloading resume:", error);
+   
       toast.error("Failed to download resume");
     }
   }, [profileData.resume, profileData.name]);
 
-  // Image compression function
   const compressImage = useCallback(async (file, maxSizeKB = 100) => {
     return new Promise((resolve, reject) => {
       const allowedTypes = [
@@ -399,7 +396,7 @@ const Student_Profile = () => {
     });
   }, []);
 
-  // PDF compression function
+
   const processPDF = useCallback(async (file) => {
     return new Promise((resolve, reject) => {
       if (file.type !== "application/pdf") {
@@ -427,7 +424,6 @@ const Student_Profile = () => {
     });
   }, []);
 
-  // Auth effect
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       clearUserData();
@@ -458,7 +454,7 @@ const Student_Profile = () => {
         setEditData(data);
         toast.success("Profile loaded successfully", { autoClose: 1500 });
       } else {
-        // Try students collection as fallback
+
         const studentRef = doc(db, "students", uid);
         const studentSnap = await getDoc(studentRef);
 
@@ -490,16 +486,12 @@ const Student_Profile = () => {
           };
         }
 
-        console.log("Current editData:", editData);
-        console.log("Validation errors:", validateAllFields(editData));
-        console.log("Is form valid:", isFormValid);
-
         setProfileData(defaultData);
         setEditData(defaultData);
         toast.info("Please complete your profile setup");
       }
     } catch (error) {
-      console.error("Error loading profile:", error);
+  
       toast.error("Failed to load profile. Please refresh the page.");
 
       const defaultData = {
@@ -525,9 +517,8 @@ const Student_Profile = () => {
     setIsEditing(true);
     setShowValidation(false);
     setValidationErrors({});
-    console.log("Current editData:", editData);
-    console.log("Validation errors:", validateAllFields(editData));
-    console.log("Is form valid:", isFormValid);
+
+    ;
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -578,8 +569,7 @@ const Student_Profile = () => {
 
       toast.success("Profile saved successfully!");
     } catch (error) {
-      console.error("Error saving profile:", error);
-      toast.error("Failed to save profile. Please try again.");
+           toast.error("Failed to save profile. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -641,7 +631,7 @@ const Student_Profile = () => {
           } uploaded successfully!`
         );
       } catch (error) {
-        console.error("Error processing file:", error);
+
         setEditData((prev) => ({ ...prev, [type]: profileData[type] }));
       } finally {
         setUploading((prev) => ({ ...prev, [type]: false }));
@@ -666,7 +656,6 @@ const Student_Profile = () => {
       <p className="text-red-500 text-xs mt-1">{error}</p>
     ) : null;
 
-  // Early returns for loading states
   if (!authChecked) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -720,7 +709,7 @@ const Student_Profile = () => {
       <div className="min-h-screen bg-gray-300 py-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="mx-auto max-w-full sm:max-w-md md:max-w-lg bg-gray-200 rounded-3xl overflow-hidden shadow-xl backdrop-blur-lg border border-gray-200/50">
-            {/* Profile Header */}
+            
             <div className="px-6 pt-8 pb-6">
               <div className="text-center">
                 <div className="relative inline-block">
@@ -751,7 +740,7 @@ const Student_Profile = () => {
               </div>
             </div>
 
-            {/* Edit Profile Button */}
+  
             <div className="px-8 py-4">
               <button
                 onClick={handleEditProfile}
@@ -761,7 +750,7 @@ const Student_Profile = () => {
               </button>
             </div>
 
-            {/* About Section */}
+
             <div className="px-6 py-4 border-t border-gray-200/50">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
                 About
@@ -771,7 +760,6 @@ const Student_Profile = () => {
               </p>
             </div>
 
-            {/* Education Section */}
             <div className="px-6 py-4 border-t border-gray-200/50">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
                 Education
@@ -792,9 +780,7 @@ const Student_Profile = () => {
               </div>
             </div>
 
-            {/* Links Section */}
 
-{/* Links Section */}
 <div className="px-6 py-4 border-t border-gray-200/50 mb-4">
   <h2 className="text-lg font-semibold text-gray-800 mb-3">
     Social Links
@@ -905,7 +891,7 @@ const Student_Profile = () => {
 
           </div>
 
-          {/* Edit Modal */}
+ 
           {isEditing && (
             <div className="fixed inset-0 bg-gray-700 flex items-center justify-center p-4 z-50">
               <div className="bg-gray-100 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl backdrop-blur-lg border border-gray-200/50">
@@ -923,7 +909,7 @@ const Student_Profile = () => {
                     </button>
                   </div>
 
-                  {/* Profile Picture Upload */}
+        
                   <div className="mb-6 text-center">
                     <div className="relative inline-block">
                       <div
@@ -974,9 +960,9 @@ const Student_Profile = () => {
                     />
                   </div>
 
-                  {/* Form Fields */}
+        
                   <div className="space-y-4 mb-6">
-                    {/* Name Field */}
+       
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Name <span className="text-red-500">*</span>
@@ -998,7 +984,6 @@ const Student_Profile = () => {
                       <ValidationError error={validationErrors.name} />
                     </div>
 
-                    {/* Title Field */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Title <span className="text-red-500">*</span>
@@ -1041,7 +1026,7 @@ const Student_Profile = () => {
                       <ValidationError error={validationErrors.bio} />
                     </div>
 
-                    {/* University Field */}
+         
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         University <span className="text-red-500">*</span>
@@ -1063,7 +1048,7 @@ const Student_Profile = () => {
                       <ValidationError error={validationErrors.university} />
                     </div>
 
-                    {/* Degree Program Field */}
+          
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Degree Program <span className="text-red-500">*</span>
@@ -1105,7 +1090,7 @@ const Student_Profile = () => {
                       <ValidationError error={validationErrors.timePeriod} />
                     </div>
 
-                    {/* LinkedIn Field */}
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         LinkedIn Profile <span className="text-red-500">*</span>
@@ -1127,7 +1112,7 @@ const Student_Profile = () => {
                       <ValidationError error={validationErrors.linkedin} />
                     </div>
 
-                    {/* GitHub Field */}
+      
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         GitHub Profile <span className="text-red-500">*</span>
@@ -1149,7 +1134,7 @@ const Student_Profile = () => {
                       <ValidationError error={validationErrors.github} />
                     </div>
 
-                    {/* About Field */}
+            
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         About <span className="text-red-500">*</span>
@@ -1177,7 +1162,7 @@ const Student_Profile = () => {
                       </div>
                     </div>
 
-                    {/* Resume Upload */}
+             
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Resume <span className="text-red-500">*</span>
@@ -1226,7 +1211,6 @@ const Student_Profile = () => {
                     </div>
                   </div>
 
-                  {/* Validation Summary */}
                   {showValidation &&
                     Object.keys(validationErrors).length > 0 && (
                       <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -1243,7 +1227,7 @@ const Student_Profile = () => {
                       </div>
                     )}
 
-                  {/* Action Buttons */}
+          
                   <div className="flex gap-3">
                     <button
                       onClick={handleSave}
@@ -1280,7 +1264,7 @@ const Student_Profile = () => {
                     </button>
                   </div>
 
-                  {/* Form Status */}
+               
                   {!isFormValid && (
                     <div className="mt-3 text-center">
                       <p className="text-xs text-gray-500">
@@ -1296,26 +1280,7 @@ const Student_Profile = () => {
         </div>
       </div>
 
-      {/* Back to Dashboard Button - Fixed Position */}
-      <div className="fixed bottom-6 right-6 z-40">
-        {/* <Link
-          to="/student-dashboard"
-          className="inline-flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm"
-        >
-          <svg
-            className="w-4 h-4 mr-2 rotate-180"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Back to Dashboard
-        </Link> */}
-      </div>
+
 
       <ToastContainer {...toastConfig} />
     </>

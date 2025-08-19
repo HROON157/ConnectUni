@@ -12,17 +12,14 @@ const ActiveApplications = () => {
   const [user, setUser] = useState(null);
   const [initialLoad, setInitialLoad] = useState(true);
   
-  // Use ref to avoid dependency issues and cache data
   const hrProfilesRef = useRef({});
   const jobCacheRef = useRef({});
   
-  // Update ref when hrProfiles state changes
   useEffect(() => {
     hrProfilesRef.current = hrProfiles;
   }, [hrProfiles]);
 
-  // Monitor authentication state
-  useEffect(() => {
+    useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setInitialLoad(false);
@@ -36,14 +33,13 @@ const ActiveApplications = () => {
     return () => unsubscribe();
   }, []);
 
-  // Optimized batch fetch for HR profiles
-  const batchFetchHRProfiles = useCallback(async (userIds) => {
+    const batchFetchHRProfiles = useCallback(async (userIds) => {
     const uniqueUserIds = [...new Set(userIds)].filter(id => !hrProfilesRef.current[id]);
     
     if (uniqueUserIds.length === 0) return;
 
     try {
-      // Fetch all HR profiles in parallel instead of sequentially
+      
       const profilePromises = uniqueUserIds.map(async (userId) => {
         try {
           let hrDoc = await getDoc(doc(db, "hrProfiles", userId));
@@ -51,7 +47,7 @@ const ActiveApplications = () => {
             return { userId, data: hrDoc.data() };
           }
 
-          // Fallback to hr_users collection
+          
           hrDoc = await getDoc(doc(db, "hr_users", userId));
           if (hrDoc.exists()) {
             return { userId, data: hrDoc.data() };
@@ -59,15 +55,14 @@ const ActiveApplications = () => {
 
           return { userId, data: null };
         } catch (error) {
-          console.error(`Error fetching HR profile for ${userId}:`, error);
+        
           return { userId, data: null };
         }
       });
 
       const results = await Promise.all(profilePromises);
       
-      // Update profiles in batch
-      const newProfiles = { ...hrProfilesRef.current };
+       const newProfiles = { ...hrProfilesRef.current };
       results.forEach(({ userId, data }) => {
         if (data) {
           newProfiles[userId] = data;
@@ -77,11 +72,11 @@ const ActiveApplications = () => {
       hrProfilesRef.current = newProfiles;
       setHrProfiles(newProfiles);
     } catch (error) {
-      console.error("Error batch fetching HR profiles:", error);
+ 
     }
   }, []);
 
-  // Optimized batch fetch for job details
+
   const batchFetchJobDetails = useCallback(async (jobIds) => {
     const uniqueJobIds = [...new Set(jobIds)].filter(id => id && !jobCacheRef.current[id]);
     
@@ -96,23 +91,21 @@ const ActiveApplications = () => {
             data: jobDoc.exists() ? jobDoc.data() : null 
           };
         } catch (error) {
-          console.error(`Error fetching job ${jobId}:`, error);
+   
           return { jobId, data: null };
         }
       });
 
       const results = await Promise.all(jobPromises);
       
-      // Cache job details
       results.forEach(({ jobId, data }) => {
         jobCacheRef.current[jobId] = data;
       });
     } catch (error) {
-      console.error("Error batch fetching job details:", error);
+
     }
   }, []);
 
-  // Optimized fetch applications
   const fetchApplications = useCallback(async () => {
     try {
       setLoading(true);
@@ -122,7 +115,6 @@ const ActiveApplications = () => {
         throw new Error("User not authenticated");
       }
 
-      // Step 1: Fetch all applications at once
       const q = query(
         collection(db, "applications"),
         where("studentId", "==", user.uid),
@@ -131,7 +123,7 @@ const ActiveApplications = () => {
 
       const snapshot = await getDocs(q);
       
-      // Step 2: Filter applications first, then process
+
       const rawApplications = [];
       const userIds = [];
       const jobIds = [];
@@ -139,7 +131,7 @@ const ActiveApplications = () => {
       snapshot.docs.forEach((docSnap) => {
         const appData = docSnap.data();
         
-        // Only include active applications (not completed/rejected/accepted)
+
         const activeStatuses = ['pending', 'applied', 'interviewing'];
         if (activeStatuses.includes(appData.status || 'pending')) {
           rawApplications.push({
@@ -147,7 +139,7 @@ const ActiveApplications = () => {
             ...appData
           });
           
-          // Collect IDs for batch fetching
+   
           if (appData.postedBy) userIds.push(appData.postedBy);
           if (appData.jobId) jobIds.push(appData.jobId);
         }
@@ -159,15 +151,13 @@ const ActiveApplications = () => {
         return;
       }
 
-      // Step 3: Batch fetch all required data in parallel
       await Promise.all([
         batchFetchHRProfiles(userIds),
         batchFetchJobDetails(jobIds)
       ]);
 
-      // Step 4: Process applications with cached data
       const processedApplications = rawApplications.map((appData) => {
-        // Get job title from cache or fallback
+       
         let jobTitle = appData.jobTitle || "Unknown Position";
         if (appData.jobId && jobCacheRef.current[appData.jobId]) {
           jobTitle = jobCacheRef.current[appData.jobId].jobTitle || jobTitle;
@@ -182,14 +172,13 @@ const ActiveApplications = () => {
 
       setApplications(processedApplications);
     } catch (error) {
-      console.error("Error fetching applications:", error);
+
       setError(error.message);
     } finally {
       setLoading(false);
     }
   }, [user, batchFetchHRProfiles, batchFetchJobDetails]);
 
-  // Fetch applications only when user is authenticated
   useEffect(() => {
     if (!initialLoad && user) {
       fetchApplications();
@@ -198,7 +187,7 @@ const ActiveApplications = () => {
     }
   }, [initialLoad, user, fetchApplications]);
 
-  // Format date
+
   const formatDate = (timestamp) => {
     if (!timestamp) return 'N/A';
     
@@ -210,12 +199,12 @@ const ActiveApplications = () => {
         day: 'numeric'
       });
     } catch (error) {
-      console.error("Error formatting date:", error);
+   
       return 'N/A';
     }
   };
 
-  // Optimized Company Logo component
+
   const CompanyLogo = React.memo(({ application, size = "w-12 h-12 sm:w-16 sm:h-16" }) => {
     const hrProfile = hrProfiles[application.postedBy];
     const companyLogo = hrProfile?.companyLogo;
@@ -279,7 +268,6 @@ const ActiveApplications = () => {
     );
   });
 
-  // Get status badge
   const getStatusBadge = (status) => {
     const statusConfig = {
       pending: {
@@ -313,14 +301,12 @@ const ActiveApplications = () => {
     );
   };
 
-  // Filter applications based on active tab
   const filteredApplications = applications.filter(app => {
     if (activeTab === 'Applied') return true;
     if (activeTab === 'Interviewing') return app.status === 'interviewing';
     return true;
   });
 
-  // Show loading only during initial load or when we're sure we need to load
   if (initialLoad || (loading && !error)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4 flex items-center justify-center">
@@ -359,7 +345,7 @@ const ActiveApplications = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
+  
 <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
@@ -384,7 +370,6 @@ const ActiveApplications = () => {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="mb-4 sm:mb-6">
           <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl">
             {['Applied', 'Interviewing'].map((tab) => (
@@ -403,7 +388,7 @@ const ActiveApplications = () => {
           </div>
         </div>
 
-        {/* Applications List */}
+    
         {filteredApplications.length === 0 ? (
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12 text-center">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">

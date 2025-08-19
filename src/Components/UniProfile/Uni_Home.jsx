@@ -40,15 +40,13 @@ const Uni_Home = () => {
 
   const UniversityCard = ({ university }) => (
     <div className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200">
-      {/* Background Gradient Overlay */}
+ 
       <div className={`absolute inset-0 bg-gradient-to-br ${university.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
       
-      {/* Card Content */}
-      <div className="relative p-6">
-        {/* Header Section */}
-        <div className="flex items-start justify-between mb-4">
+          <div className="relative p-6">
+                <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-4">
-            {/* University Logo */}
+            
             <div className="relative">
               <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg ring-4 ring-white group-hover:ring-opacity-50 transition-all duration-300">
                 <img 
@@ -57,14 +55,12 @@ const Uni_Home = () => {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
-              {/* Floating Badge */}
-              <div className={`absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r ${university.color} rounded-full flex items-center justify-center shadow-lg`}>
+                          <div className={`absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r ${university.color} rounded-full flex items-center justify-center shadow-lg`}>
                 <HiOutlineAcademicCap className="w-3 h-3 text-white" />
               </div>
             </div>
 
-            {/* University Info */}
-            <div className="flex-1">
+                       <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300" style={{fontFamily:'Public Sans'}}>
                 {university.name}
               </h3>
@@ -84,13 +80,11 @@ const Uni_Home = () => {
           </div>
         </div>
 
-        {/* Description */}
-        <p className="text-gray-600 text-sm mb-4 leading-relaxed" style={{fontFamily:'Public Sans'}}>
+         <p className="text-gray-600 text-sm mb-4 leading-relaxed" style={{fontFamily:'Public Sans'}}>
           {university.description}
         </p>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+           <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="text-center p-3 bg-gray-50 rounded-xl">
             <HiOutlineUsers className="w-5 h-5 mx-auto mb-1 text-blue-500" />
             <div className="text-lg font-bold text-gray-900">{university.students}</div>
@@ -108,16 +102,15 @@ const Uni_Home = () => {
           </div>
         </div>
 
-        {/* Action Button */}
-        <Link to={university.link}>
-          <button className={`w-full bg-gradient-to-r ${university.color} ${university.hoverColor} text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl group-hover:scale-105`} style={{fontFamily:'Public Sans'}}>
+           <Link to={university.link}>
+          <button className={`w-full bg-gradient-to-r ${university.color} ${university.hoverColor} text-white cursor-pointer py-3 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl group-hover:scale-105`} style={{fontFamily:'Public Sans'}}>
             <span>View Profile</span>
             <HiOutlineArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
           </button>
         </Link>
       </div>
 
-      {/* Decorative Elements */}
+      
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-pink-400/10 to-yellow-600/10 rounded-full translate-y-12 -translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
     </div>
@@ -126,7 +119,7 @@ const Uni_Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
+     
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-4 lg:space-y-0">
             <div className="flex items-center space-x-3">
@@ -152,8 +145,7 @@ const Uni_Home = () => {
             </Link>
           </div>
 
-          {/* Stats Bar */}
-          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200 mb-6 sm:mb-8">
+             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200 mb-6 sm:mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">2</div>
@@ -174,8 +166,7 @@ const Uni_Home = () => {
             </div>
           </div>
 
-          {/* Filter Section */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
             <div className="flex items-center space-x-4">
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900" style={{fontFamily:'Public Sans'}}>All Universities</h2>
               <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full">
@@ -185,7 +176,7 @@ const Uni_Home = () => {
           </div>
         </div>
 
-        {/* Universities Grid */}
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {universities.map((university) => (
             <UniversityCard key={university.id} university={university} />
