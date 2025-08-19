@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { db } from "../../Firebase/db";
+import { where,getDocs,query,collection } from "firebase/firestore";
+import { Link } from "react-router-dom";
 const company = {
   name: "Systems Ltd",
   logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCxe9z13mFK8gddPVIvpGeUNOFijVUSPLvkQ&s",
-  location: "Lahore, Punjab, Pakistan",
+  headQuarter: "Lahore, Punjab, Pakistan",
+  location: "Lahore, Pakistan",
   industry: "Technology",
   size: "7,000+ employees",
   founded: "1977",
   overview:
-    "Systems Limited is one of Pakistan's leading IT and software companies, providing digital transformation, software development, and IT consulting services. They offer end-to-end solutions for various industries, including banking, retail, and manufacturing, with expertise in cloud computing, data analytics, and enterprise applications.",
+    "Systems Limited is one of Pakistan's leading IT and software companies, providing digital transformation, software development, and IT consulting services. They offer end-to-end solutions for various industries, including banking, retail, and manufacturing, with expertise in cloud computing, data analytics, and enterprise applications.",
   mission:
     "To deliver innovative technology solutions that empower businesses to meet their ever-evolving challenges, providing superior value to clients, employees, and stakeholders.",
   vision:
@@ -18,154 +21,281 @@ const company = {
     { label: "Collaboration" },
     { label: "Integrity" },
     { label: "Customer Centricity" },
-    { label: "Excellence" }
-  ]
+    { label: "Excellence" },
+  ],
 };
 
 const tabs = [
   { label: "About", value: "about" },
-  { label: "Openings", value: "openings" }
+  { label: "Openings", value: "openings" },
 ];
+const formatDate = (timestamp) => {
+  if (!timestamp) return "N/A";
+  try {
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  } catch (error) {
+    return "N/A";
+  }
+};
+const Spinner = () => (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm sm:text-base">Loading Jobs...</p>
+        </div>
+      </div>
+);
 
 const Systems = () => {
   const [activeTab, setActiveTab] = useState("about");
-
-  return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Company Profile</h1>
-          <div className="flex space-x-4">
-            <button className="text-gray-700 hover:text-gray-900">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-            <button className="text-gray-700 hover:text-gray-900">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-            </button>
+  const [loading, setLoading] = useState(false);
+  const [jobs, setJobs] = useState([]);
+  useEffect(()=>{
+     const fetchJobs = async () => {
+          setLoading(true);
+          try {
+            const hrQuery = query(
+              collection(db, "hrProfiles"),
+              where("company", "in", ["SYSTEMS LIMITED", "SYSTEMS LTD", "SYSTEMS"])
+            );
+            const querySnapshot = await getDocs(hrQuery);
+            const hrIDs = querySnapshot.docs.map((doc) => doc.id);
+    
+            const jobsCollection = collection(db, "jobOpenings");
+            const jobsSnapshot = await getDocs(jobsCollection);
+            const netSolJobs = [];
+            jobsSnapshot.forEach((doc) => {
+              const data = doc.data();
+              if (data.status === "active" && hrIDs.includes(data.postedBy)) {
+                netSolJobs.push({ id: doc.id, ...data });
+              }
+            });
+            setJobs(netSolJobs);
+          } catch (error) {
+            setJobs([]);
+          }
+          setLoading(false);
+        };
+    if(activeTab === "openings") {
+      fetchJobs();
+    }
+  },[activeTab])
+    return (
+      <div className="min-h-screen bg-[#f7fafc] px-4 py-8 sm:py-12">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                Company Profile
+              </h1>
+              <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                Verified
+              </span>
+            </div>
+            <p className="text-sm text-gray-500">
+              Discover more about the company and available opportunities
+            </p>
           </div>
-        </div>
-
-        {/* Company Card */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
-          <div className="flex-shrink-0">
-            <div className="w-20 h-20 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
-              <img
-                src={company.logo}
-                alt={company.name}
-                className="w-16 h-16 object-contain"
-              />
-            </div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-bold text-2xl text-gray-900">{company.name}</div>
-            <div className="text-blue-600 text-sm mt-1 font-medium">
-              {company.location}
-            </div>
-            <div className="text-gray-500 text-xs mt-1">
-              {company.industry} &nbsp;|&nbsp; {company.size} &nbsp;|&nbsp; Founded {company.founded}
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200 mb-6">
-          {tabs.map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setActiveTab(tab.value)}
-              className={`px-4 py-3 -mb-px font-medium text-sm transition border-b-2 ${
-                activeTab === tab.value
-                  ? "border-black text-gray-900"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === "about" && (
-          <div className="space-y-8">
-            {/* Overview */}
-            <section className="bg-white p-6 rounded-lg border border-gray-100">
-              <h3 className="font-bold text-lg text-gray-900 mb-3">Overview</h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
-                {company.overview}
-              </p>
-            </section>
-
-            {/* Mission & Vision */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <section className="bg-white p-6 rounded-lg border border-gray-100">
-                <h3 className="font-bold text-lg text-gray-900 mb-3">Mission</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  {company.mission}
-                </p>
-              </section>
-              <section className="bg-white p-6 rounded-lg border border-gray-100">
-                <h3 className="font-bold text-lg text-gray-900 mb-3">Vision</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  {company.vision}
-                </p>
-              </section>
-            </div>
-
-            {/* Company Details */}
-            <section className="bg-white p-6 rounded-lg border border-gray-100">
-              <h3 className="font-bold text-lg text-gray-900 mb-4">Company Details</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <div className="font-medium text-gray-500">Headquarters</div>
-                  <div className="text-gray-900 mt-1">{company.location}</div>
-                </div>
-                <div>
-                  <div className="font-medium text-gray-500">Founded</div>
-                  <div className="text-gray-900 mt-1">{company.founded}</div>
-                </div>
-                <div>
-                  <div className="font-medium text-gray-500">Company Size</div>
-                  <div className="text-gray-900 mt-1">{company.size}</div>
-                </div>
+  
+          {/* Company Card */}
+          <div className="flex flex-col sm:flex-row gap-6 bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-200 hover:shadow-md transition duration-200">
+            <div className="flex-shrink-0">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm overflow-hidden">
+                <img
+                  src={company.logo}
+                  alt={company.name}
+                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                />
               </div>
-            </section>
-
-            {/* Values */}
-            <section className="bg-white p-6 rounded-lg border border-gray-100">
-              <h3 className="font-bold text-lg text-gray-900 mb-4">Core Values</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {company.values.map((val) => (
-                  <div
-                    key={val.label}
-                    className="border rounded-lg px-4 py-3 bg-white border-gray-100 hover:border-gray-200 transition"
-                  >
-                    <span className="font-medium text-gray-800 text-sm">{val.label}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <h2 className="font-bold text-xl sm:text-2xl text-gray-900">{company.name}</h2>
+                  <div className="flex items-center mt-1">
+                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-blue-700 text-sm ml-1 font-medium">
+                      {company.location}
+                    </p>
                   </div>
-                ))}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                    {company.industry}
+                  </span>
+                  <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                    {company.size}
+                  </span>
+                </div>
               </div>
-            </section>
+              
+              <div className="mt-3 space-y-1">
+                <p className="text-xs text-gray-500">
+                  <span className="font-medium text-gray-600">Founded:</span> {company.founded}
+                </p>
+                <p className="text-xs text-gray-500">
+                  <span className="font-medium text-gray-600">Headquarters:</span> {company.headQuarter}
+                </p>
+              </div>
+            </div>
           </div>
-        )}
-
-        {activeTab === "openings" && (
-          <div className="bg-white p-8 rounded-lg border border-gray-100 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-gray-500 text-sm mt-4">No job openings available at the moment</p>
-            <p className="text-gray-400 text-xs mt-1">Check back later for new opportunities</p>
+  
+          {/* Tabs */}
+          <div className="flex border-b border-gray-200 mb-8">
+            {tabs.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
+                className={`px-4 py-3 -mb-px font-medium text-sm sm:text-base transition-all ${
+                  activeTab === tab.value
+                    ? "border-b-2 border-blue-600 text-blue-700 font-semibold"
+                    : "text-gray-500 hover:text-blue-600"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
-        )}
+  
+          {/* Tab Content */}
+          {activeTab === "about" && (
+            <div className="space-y-6">
+              {/* Overview */}
+              <section className="bg-white p-6 rounded-lg border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <div className="w-1 h-6 bg-blue-600 rounded-full mr-3"></div>
+                  <h3 className="font-bold text-lg text-gray-900">Overview</h3>
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  {company.overview}
+                </p>
+              </section>
+  
+              {/* Mission & Vision */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <section className="bg-white p-6 rounded-lg border border-gray-200">
+                  <div className="flex items-center mb-4">
+                    <div className="w-1 h-6 bg-blue-600 rounded-full mr-3"></div>
+                    <h3 className="font-bold text-lg text-gray-900">Mission</h3>
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {company.mission}
+                  </p>
+                </section>
+                <section className="bg-white p-6 rounded-lg border border-gray-200">
+                  <div className="flex items-center mb-4">
+                    <div className="w-1 h-6 bg-blue-600 rounded-full mr-3"></div>
+                    <h3 className="font-bold text-lg text-gray-900">Vision</h3>
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {company.vision}
+                  </p>
+                </section>
+              </div>
+  
+              {/* Values */}
+              <section className="bg-white p-6 rounded-lg border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <div className="w-1 h-6 bg-blue-600 rounded-full mr-3"></div>
+                  <h3 className="font-bold text-lg text-gray-900">Core Values</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {company.values.map((val) => (
+                    <div
+                      key={val.label}
+                      className="border rounded-lg px-4 py-3 bg-blue-50 border-blue-100 hover:bg-blue-100 transition flex items-center"
+                    >
+                      <svg className="w-4 h-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-medium text-blue-800 text-sm">
+                        {val.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+          )}
+  
+          {activeTab === "openings" && (
+            <div>
+              {loading ? (
+                <Spinner />
+              ) : jobs.length === 0 ? (
+                <div className="text-center py-12">
+                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">No openings available</h3>
+                  <p className="mt-1 text-sm text-gray-500">There are currently no job openings at this company.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-medium text-gray-900">
+                      {jobs.length} {jobs.length === 1 ? 'Opening' : 'Openings'} Available
+                    </h3>
+                    <div className="text-xs text-gray-500">
+                      Sorted by: <span className="font-medium">Most Recent</span>
+                    </div>
+                  </div>
+                  
+                  {jobs.map((job) => (
+                    <div
+                      key={job.id}
+                      className="bg-white rounded-lg shadow-sm border border-gray-200 px-5 py-4 hover:shadow-md transition group"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-blue-700 text-base group-hover:text-blue-800">
+                            {job.jobTitle}
+                          </h4>
+                          <div className="flex items-center mt-1">
+                            <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                            </svg>
+                            <p className="text-gray-600 text-sm ml-1">{job.location}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                            {job.type || "Full Time"}
+                          </span>
+                        </div>
+                      </div>
+                      {job.jobDescription && (
+                        <p className="text-gray-700 text-sm mt-3 line-clamp-2">
+                          {job.jobDescription}
+                        </p>
+                      )}
+                      <div className="flex justify-between items-center mt-3">
+                        {job.createdAt && (
+                          <p className="text-gray-500 text-xs">
+                            Posted: {formatDate(job.createdAt)}
+                          </p>
+                        )}
+                        <Link to="/student-dashboard" className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                          View details →
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default Systems;

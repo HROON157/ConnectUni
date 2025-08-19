@@ -476,7 +476,7 @@ const HR_Profile = () => {
         ...editData,
         name: editData.name.trim(),
         title: editData.title.trim() || "HR Professional",
-        company: editData.company.trim() || "Company Name",
+        company: editData.company.trim().toUpperCase() || "Company Name",
         linkedin: editData.linkedin.trim(),
         period: editData.period.trim(),
         about: editData.about.trim(),
