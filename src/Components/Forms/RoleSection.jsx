@@ -1,7 +1,6 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
-import ReCAPTCHA from "react-google-recaptcha";
 import { toast, ToastContainer } from "react-toastify";
 import { signUpWithRole } from "../../Firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,9 +22,8 @@ const CombinedSignup = ({ userRole = "student" }) => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [verified, setVerified] = useState(false);
   const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState({
     email: false,
     password: false,
@@ -36,7 +34,6 @@ const CombinedSignup = ({ userRole = "student" }) => {
     hodReferralCode: false,
   });
 
-
   const handleInputChange = useCallback((e) => {
     const { name, value, type: inputType, checked } = e.target;
     setFormData((prev) => ({
@@ -44,7 +41,6 @@ const CombinedSignup = ({ userRole = "student" }) => {
       [name]: inputType === "checkbox" ? checked : value,
     }));
   }, []);
-
 
   const handleRoleChange = useCallback((newRole) => {
     setFormData((prev) => ({
@@ -55,11 +51,6 @@ const CombinedSignup = ({ userRole = "student" }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!verified) {
-      toast.error("Please complete the reCAPTCHA");
-      return;
-    }
 
     if (formData.password.length < 6) {
       toast.error("Password must be at least 6 characters long");
@@ -79,7 +70,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
     setIsLoading(true);
 
     try {
-      const result = await signUpWithRole(formData);
+      await signUpWithRole(formData);
       toast.success("Account created successfully! Redirecting to login...", {
         onClose: () => navigate("/login"),
       });
@@ -111,14 +102,6 @@ const CombinedSignup = ({ userRole = "student" }) => {
 
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
-  }, []);
-
-  const handleCaptchaChange = useCallback((value) => {
-    setVerified(!!value);
-  }, []);
-
-  const handleCaptchaExpired = useCallback(() => {
-    setVerified(false);
   }, []);
 
   return (
@@ -519,39 +502,14 @@ const CombinedSignup = ({ userRole = "student" }) => {
             .
           </div>
 
-          <div className="mt-4 flex justify-center">
-
-  <div className="recaptcha-container">
-    
-    <ReCAPTCHA
-        sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-      size="normal"
-      onChange={handleCaptchaChange}
-      onExpired={handleCaptchaExpired}
-      onError={() => setVerified(false)}
-    />
-  </div>
-</div>
-=======
-            <div className="recaptcha-container">
-              <ReCAPTCHA
-                sitekey="6LdUPJcrAAAAAOTXcQy3X-1Tpi_dNt-UnCFxfq4Y"
-                size="normal"
-                onChange={handleCaptchaChange}
-                onExpired={handleCaptchaExpired}
-                onError={() => setVerified(false)}
-              />
-            </div>
-          </div>
-
           <div className="pt-4">
             <button
               type="submit"
-              disabled={!verified || isLoading}
+              disabled={isLoading}
               onMouseEnter={() => setIsHoveringSubmit(true)}
               onMouseLeave={() => setIsHoveringSubmit(false)}
               className={`relative overflow-hidden w-full font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm shadow-lg ${
-                verified && !isLoading
+                !isLoading
                   ? "bg-gradient-to-r from-blue-500 to-indigo-600 cursor-pointer text-white hover:shadow-blue-500/30"
                   : "bg-gray-300 cursor-not-allowed text-gray-500"
               }`}
@@ -588,7 +546,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
                       ? "Student"
                       : "HR Professional"}
                   </span>
-                  {verified && !isLoading && (
+                  {!isLoading && (
                     <span
                       className={`absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full ${
                         isHoveringSubmit ? "opacity-100" : "opacity-0"
