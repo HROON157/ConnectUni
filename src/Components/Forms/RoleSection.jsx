@@ -520,6 +520,19 @@ const CombinedSignup = ({ userRole = "student" }) => {
           </div>
 
           <div className="mt-4 flex justify-center">
+
+  <div className="recaptcha-container">
+    
+    <ReCAPTCHA
+        sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+      size="normal"
+      onChange={handleCaptchaChange}
+      onExpired={handleCaptchaExpired}
+      onError={() => setVerified(false)}
+    />
+  </div>
+</div>
+=======
             <div className="recaptcha-container">
               <ReCAPTCHA
                 sitekey="6LdUPJcrAAAAAOTXcQy3X-1Tpi_dNt-UnCFxfq4Y"
