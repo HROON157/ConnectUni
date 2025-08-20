@@ -100,25 +100,21 @@ const HR_Profile = () => {
           errors.company = "Company name must be less than 100 characters";
         }
         break;
-      case "linkedin":
-   
+              case "linkedin":
         if (!value || !value.trim()) {
           errors.linkedin = "LinkedIn profile is required";
         } else {
-          const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/.+/;
-          const urlRegex = /^https?:\/\/.+/;
-          const isValidUrl = urlRegex.test(value.trim());
-          const isLinkedInDomain =
-            linkedinRegex.test(value.trim()) ||
-            linkedinRegex.test(`https://www.${value.trim()}`);
+          const trimmedValue = value.trim();
 
-          if (!isValidUrl && !isLinkedInDomain) {
-            errors.linkedin = "Please enter a valid LinkedIn URL";
-          } else if (!value.trim().toLowerCase().includes("linkedin.com")) {
+          const isLinkedInUrl = trimmedValue
+            .toLowerCase()
+            .includes("linkedin.com");
+          if (!isLinkedInUrl) {
             errors.linkedin = "Please enter a LinkedIn URL";
           }
         }
         break;
+
       case "period":
         if (!value || !value.trim()) {
           errors.period = "Work period is required";

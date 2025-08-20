@@ -23,6 +23,9 @@ import ActiveApplications from './Components/StudentDashboard/ActiveApplications
 import Companies from './Components/CompanyProfile/Companies'
 import Systems from "./Components/CompanyProfile/Systems"
 import Netsol from "./Components/CompanyProfile/Netsol"
+import Messages from './Components/Messages/Messages'
+import ProtectedRoute from "./Pages/ProtectedRoute"
+
 function App() {
   return (
     <AuthProvider>
@@ -30,6 +33,7 @@ function App() {
         <div className="App">
           <Navbar />
           <Routes>
+            
             <Route path="/" element={<Home />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/internships" element={<Internships />} />
@@ -37,20 +41,78 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/student-signup" element={<StudentSignup />} />
             <Route path="/hr-signup" element={<CompanySignup />} />
-            <Route path="/student-dashboard" element={<StudentDashboard />} />
-            <Route path="/hr-dashboard" element={<HRDashboard />} />
-            <Route path="/add-new-opening" element={<New_Openings />} />
             <Route path='/browse-universities' element={<Uni_Home />} />
             <Route path='/bnu-profile' element={<BNU_Profile />} />
             <Route path='/umt-profile' element={<UMT_Profile />} />
-            <Route path='/past-openings' element={<PastOpening />} />
-            <Route path='/hr-profile' element={<HR_Profile />} />
-            <Route path='/student-profile' element={<Student_Profile />} />
-            <Route path='past-applications' element={<PastApplications/>}/>
-            <Route path='active-applications' element={<ActiveApplications/>}/>
             <Route path='browse-companies' element={<Companies/>}/>
             <Route path="/company/systems" element={<Systems />} />
             <Route path="/company/netsol" element={<Netsol />} />
+            <Route path="/messages" element={<Messages />} />
+
+            <Route 
+              path="/student-dashboard" 
+              element={
+                <ProtectedRoute requiredRole="student">
+                  <StudentDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path='/student-profile' 
+              element={
+                <ProtectedRoute requiredRole="student">
+                  <Student_Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path='past-applications' 
+              element={
+                <ProtectedRoute requiredRole="student">
+                  <PastApplications/>
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path='active-applications' 
+              element={
+                <ProtectedRoute requiredRole="student">
+                  <ActiveApplications/>
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/hr-dashboard" 
+              element={
+                <ProtectedRoute requiredRole="hr">
+                  <HRDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/add-new-opening" 
+              element={
+                <ProtectedRoute requiredRole="hr">
+                  <New_Openings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path='/past-openings' 
+              element={
+                <ProtectedRoute requiredRole="hr">
+                  <PastOpening />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path='/hr-profile' 
+              element={
+                <ProtectedRoute requiredRole="hr">
+                  <HR_Profile />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </div>
       </Router>

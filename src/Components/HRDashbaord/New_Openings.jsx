@@ -103,8 +103,8 @@ const New_Openings = () => {
       
 
       const jobId = await createJobOpening(jobData, currentUser.uid);
-  
-      toast.success("🎉 Job opening created successfully!", {
+
+      toast.success("Job opening created successfully!", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,

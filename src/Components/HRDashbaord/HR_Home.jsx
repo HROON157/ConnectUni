@@ -36,6 +36,16 @@ const HR_Home = () => {
   const [showApplicationsModal, setShowApplicationsModal] = useState(false);
   const [loadingApplications, setLoadingApplications] = useState(false);
   const [studentProfiles, setStudentProfiles] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const jobsPerPage = 5;
+    const indexOfLastJob = currentPage * jobsPerPage;
+    const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+    const currentJobs = jobOpenings.slice(indexOfFirstJob, indexOfLastJob);
+    const totalPages = Math.ceil(jobOpenings.length / jobsPerPage);
+    const handlePageChange = (pageNumber) => {
+      setCurrentPage(pageNumber);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
   const fetchHRProfile = async () => {
     try {
       const uid = user?.uid || localStorage.getItem("uid");
@@ -48,7 +58,7 @@ const HR_Home = () => {
         setHrProfile(docSnap.data());
       }
     } catch (error) {
-      console.error("Error fetching HR profile:", error);
+     
     }
   };
   const fetchStudentProfile = async (studentId) => {
@@ -68,7 +78,6 @@ const HR_Home = () => {
       }
       return null;
     } catch (error) {
-      console.error("Error fetching student profile:", error);
       return null;
     }
   };
@@ -115,7 +124,7 @@ const HR_Home = () => {
           setJobOpenings(updatedOpenings);
         }
       } catch (error) {
-        console.error("Error closing job opening:", error);
+       
         alert("Failed to close job opening. Please try again.");
       } finally {
         setClosingJob(null);
@@ -170,7 +179,7 @@ const HR_Home = () => {
         applications,
       });
     } catch (error) {
-      console.error("Error fetching applications:", error);
+
       alert("Failed to load applications");
       setShowApplicationsModal(false);
     } finally {
@@ -186,7 +195,7 @@ const HR_Home = () => {
         await handleViewApplications(selectedJobApplications.job);
       }
     } catch (error) {
-      console.error("Error updating application status:", error);
+     
       alert("Failed to update application status");
     }
   };
@@ -205,7 +214,7 @@ const HR_Home = () => {
         minute: "2-digit",
       });
     } catch (error) {
-      console.error("Error formatting date:", error);
+   
       return "N/A";
     }
   };
@@ -252,7 +261,7 @@ const HR_Home = () => {
         const data = await getDashboardData();
         setDashboardData(data);
       } catch (error) {
-        console.error("Error loading dashboard data:", error);
+
       } finally {
         setLoading(false);
       }
@@ -267,7 +276,7 @@ const HR_Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("Fetching job openings from component...");
+       
 
 
         const currentUserId = user?.uid || localStorage.getItem("uid");
@@ -279,14 +288,14 @@ const HR_Home = () => {
         ) {
 
           const data = await getJobOpenings(currentUserId);
-          console.log("Job openings received for user:", currentUserId, data);
+         
           setJobOpenings(data);
         } else {
-          console.log("No valid user ID found");
+         
           setJobOpenings([]);
         }
       } catch (error) {
-        console.error("Error loading job openings:", error);
+        
         setJobOpenings([]);
       }
     };
@@ -485,8 +494,10 @@ const HR_Home = () => {
           </div>
 
           <div className="space-y-4 sm:space-y-6">
-            {jobOpenings.length > 0 ? (
-              jobOpenings.map((job) => (
+   
+            {currentJobs.length > 0 ? (
+
+              currentJobs.map((job) => (
                 <div
                   key={job.id}
                   className="bg-white/90 backdrop-blur-2xl rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg border border-gray-200/30 p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
@@ -593,6 +604,48 @@ const HR_Home = () => {
             ) : (
               <div className="text-center py-12">No Job Openings Yet</div>
             )}
+             <div className="flex justify-center items-center space-x-2 mt-8">
+   
+      <button
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className={`px-4 py-2 rounded-lg text-white font-semibold shadow 
+        ${currentPage === 1
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-gradient-to-r from-blue-500 to-indigo-600 cursor-pointer text-white hover:opacity-90"
+        }`}
+      >
+        Previous
+      </button>
+
+    
+      {Array.from({ length: totalPages }, (_, index) => (
+        <button
+          key={index + 1}
+          onClick={() => handlePageChange(index + 1)}
+          className={`px-4 py-2 rounded-lg font-semibold shadow 
+            ${currentPage === index + 1
+              ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+              : "bg-white text-gray-800 border cursor-pointer border-gray-300 hover:bg-gray-100"
+            }`}
+        >
+          {index + 1}
+        </button>
+      ))}
+
+      
+      <button
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className={`px-4 py-2 rounded-lg text-white font-semibold shadow 
+        ${currentPage === totalPages
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-gradient-to-r from-blue-500 to-indigo-600 cursor-pointer text-white hover:opacity-90"
+        }`}
+      >
+        Next
+      </button>
+    </div>
           </div>
         </div>
       </div>
