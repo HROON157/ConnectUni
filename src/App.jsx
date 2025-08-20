@@ -49,7 +49,6 @@ function App() {
             <Route path="/company/netsol" element={<Netsol />} />
             <Route path="/messages" element={<Messages />} />
 
-            {/* Student Protected Routes */}
             <Route 
               path="/student-dashboard" 
               element={

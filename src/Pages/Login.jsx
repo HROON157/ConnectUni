@@ -280,12 +280,6 @@ const Login = () => {
                 'Sign In'
               )}
             </button>
-            <Link
-              to="/forgot-password"
-              className="text-sm text-blue-600 hover:text-blue-700 underline text-center sm:text-right transition-colors font-medium"
-            >
-              Forgot password?
-            </Link>
           </div>
         </form>
 

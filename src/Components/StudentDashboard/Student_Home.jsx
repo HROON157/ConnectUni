@@ -812,9 +812,8 @@ return (
       ))}
     </div>
 
-    {/* Pagination */}
     <div className="flex justify-center items-center space-x-2 mt-8">
-      {/* Previous Button */}
+
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -827,7 +826,7 @@ return (
         Previous
       </button>
 
-      {/* Page Numbers */}
+
       {Array.from({ length: totalPages }, (_, index) => (
         <button
           key={index + 1}
@@ -842,7 +841,6 @@ return (
         </button>
       ))}
 
-      {/* Next Button */}
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
