@@ -177,7 +177,7 @@ export const createJobOpening = async (jobData, userId) => {
     
     const jobDoc = {
       ...jobData,
-      postedBy: userId, // This will filter jobs by HR user
+      postedBy: userId,
       postedByEmail: auth.currentUser?.email,
       isActive: true,      
       status: "active",   
@@ -191,7 +191,6 @@ export const createJobOpening = async (jobData, userId) => {
   }
 };
 
-// Update the existing getJobOpenings function
 export const getJobOpenings = async (userId = null) => {
   try {
     
@@ -199,14 +198,14 @@ export const getJobOpenings = async (userId = null) => {
     
     let q;
     if (userId) {
-      // Filter by specific user
+   
       q = query(
         jobsCollection,
         where("postedBy", "==", userId),
         where("status", "==", "active")
       );
     } else {
-      // Get all active jobs (for admin/general view)
+    
       q = query(
         jobsCollection,
         where("status", "==", "active")
@@ -227,8 +226,7 @@ export const getJobOpenings = async (userId = null) => {
         ...data
       });
     });
-    
-    // Sort by creation date
+
     jobs.sort((a, b) => {
       if (a.createdAt && b.createdAt) {
         return b.createdAt.seconds - a.createdAt.seconds;
@@ -264,14 +262,14 @@ export const closeJobOpening = async (jobId) => {
 };
 
 
-// Add this new function for user-specific past job openings
+
 
 export const getPastJobOpeningsByUser = async (userId) => {
   try {
    
     const jobsCollection = collection(db, "jobOpenings");
     
-    // Query for jobs posted by specific user that are closed
+
     const q = query(
       jobsCollection, 
       where("postedBy", "==", userId),
@@ -295,7 +293,7 @@ export const getPastJobOpeningsByUser = async (userId) => {
   } catch (error) {
 
     
-    // Fallback: get all closed jobs and filter client-side
+
     try {
 
       const allPastJobs = await getPastJobOpenings();
@@ -309,7 +307,7 @@ export const getPastJobOpeningsByUser = async (userId) => {
   }
 };
 
-// Keep your existing getPastJobOpenings function for compatibility
+
 export const getPastJobOpenings = async () => {
   try {
 

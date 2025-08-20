@@ -76,7 +76,6 @@ const Login = () => {
     }
 
     setLoading(true);
-    const loadingToastId = toast.loading("Signing you in...");
 
     try {
 
@@ -94,10 +93,6 @@ const Login = () => {
       
     
       const profileCheckPromise = checkProfileCompletion(user.uid, userData.role);
-      
-
-      toast.dismiss(loadingToastId);
-  
       let navigationPath;
       if (userData.role === 'student') {
         navigationPath = '/student-dashboard';
@@ -119,10 +114,7 @@ const Login = () => {
       navigate(navigationPath);
       
     } catch (error) {
-
       
-      toast.dismiss(loadingToastId);
-
       let errorMessage = "Login failed. Please try again.";
       
       switch (error.code) {
@@ -288,12 +280,6 @@ const Login = () => {
                 'Sign In'
               )}
             </button>
-            <Link
-              to="/forgot-password"
-              className="text-sm text-blue-600 hover:text-blue-700 underline text-center sm:text-right transition-colors font-medium"
-            >
-              Forgot password?
-            </Link>
           </div>
         </form>
 

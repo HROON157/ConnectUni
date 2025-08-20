@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast, ToastContainer } from "react-toastify";
 import { signUpWithRole } from "../../Firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
-import OpteraLogo from "../../assets/Logo.png"
+import OpteraLogo from "../../assets/Logo.png";
+
 const CombinedSignup = ({ userRole = "student" }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -24,6 +25,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [verified, setVerified] = useState(false);
   const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
   const [isFocused, setIsFocused] = useState({
     email: false,
     password: false,
@@ -31,27 +33,31 @@ const CombinedSignup = ({ userRole = "student" }) => {
     university: false,
     degreeProgram: false,
     companyName: false,
-    hodReferralCode: false
+    hodReferralCode: false,
   });
-  
-  const handleInputChange = (e) => {
+
+
+  const handleInputChange = useCallback((e) => {
     const { name, value, type: inputType, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: inputType === "checkbox" ? checked : value,
     }));
-  };
+  }, []);
 
-  const handleRoleChange = (newRole) => {
+
+  const handleRoleChange = useCallback((newRole) => {
     setFormData((prev) => ({
       ...prev,
       role: newRole,
     }));
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!verified) {
+      toast.error("Please complete the reCAPTCHA");
       return;
     }
 
@@ -64,27 +70,24 @@ const CombinedSignup = ({ userRole = "student" }) => {
       toast.error("Please fill in all required fields");
       return;
     }
-    if(formData.role === "student" && formData.hodReferralCode !== "HS-1221") {
+
+    if (formData.role === "student" && formData.hodReferralCode !== "HS-1221") {
       toast.error("Please enter the correct HOD referral code");
       return;
     }
 
-    const loadingToastId = toast.loading("Creating your account...");
+    setIsLoading(true);
 
     try {
       const result = await signUpWithRole(formData);
-      toast.dismiss(loadingToastId);
       toast.success("Account created successfully! Redirecting to login...", {
         onClose: () => navigate("/login"),
       });
 
       setTimeout(() => {
         navigate("/login");
-      }, 2500);
+      }, 1000);
     } catch (error) {
-      toast.dismiss(loadingToastId);
-      toast.error("Signup failed. Please try again.");
-
       let errorMessage = "Signup failed. Please try again.";
 
       if (error.code === "auth/email-already-in-use") {
@@ -101,20 +104,23 @@ const CombinedSignup = ({ userRole = "student" }) => {
       }
 
       toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
-  };
+  }, []);
 
-  const handleCaptchaChange = (value) => {
+  const handleCaptchaChange = useCallback((value) => {
     setVerified(!!value);
-  };
+  }, []);
 
-  const handleCaptchaExpired = () => {
+  const handleCaptchaExpired = useCallback(() => {
     setVerified(false);
-  };
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -127,25 +133,24 @@ const CombinedSignup = ({ userRole = "student" }) => {
         <div className="flex items-center justify-center mb-6">
           <div className="flex items-center space-x-3 group">
             <div className="relative">
-                         <div className="flex items-center justify-center mb-0">
-                                <div className="flex items-center space-x-1">
-                        
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center  overflow-hidden">
-                          <img 
-                            src={OpteraLogo} 
-                            alt="Logo" 
-                            className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-contain"
-                          />
-                        </div>
-                        <span className="text-gray-800 font-bold text-xl sm:text-2xl font-giza bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                          Join Optera
-                        </span>
-                      </div>
-                              </div>
-                        </div>
-  
+              <div className="flex items-center justify-center mb-0">
+                <div className="flex items-center space-x-1">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center overflow-hidden">
+                    <img
+                      src={OpteraLogo}
+                      alt="Logo"
+                      className="w-7 h-7 sm:w-9 sm:h-9 rounded-full object-contain"
+                    />
+                  </div>
+                  <span className="text-gray-800 font-bold text-xl sm:text-2xl font-giza bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    Join Optera
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
         <p className="text-sm text-gray-600 text-center mb-6 cursor-pointer">
           Sign up to connect with{" "}
           {formData.role === "student" ? "opportunities" : "talented students"}
@@ -168,7 +173,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
             onClick={() => handleRoleChange("hr")}
             className={`px-6 py-2 rounded-xl cursor-pointer font-medium transition-all duration-200 ${
               formData.role === "hr"
-                ? "bg-gradient-to-r from-blue-500 to-indigo-600  text-white shadow-md"
+                ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
@@ -216,7 +221,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
               required
               className={`w-full px-4 py-3 bg-gray-50/80 border rounded-xl outline-none text-gray-800 placeholder-transparent peer transition-all duration-200 ${
                 isFocused.email
-                  ? "border-blue-500  ring-blue-500/20 shadow-blue-500/10"
+                  ? "border-blue-500 ring-blue-500/20 shadow-blue-500/10"
                   : "border-gray-200 hover:border-blue-300"
               }`}
             />
@@ -234,7 +239,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
           {formData.role === "student" ? (
             <>
               <div className="relative">
-                <input 
+                <input
                   type="text"
                   name="university"
                   placeholder=" "
@@ -249,7 +254,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
                   required
                   className={`w-full px-4 py-3 bg-gray-50/80 border rounded-xl outline-none text-gray-800 placeholder-transparent peer transition-all duration-200 ${
                     isFocused.university
-                      ? "border-blue-500  ring-blue-500/20 shadow-blue-500/10"
+                      ? "border-blue-500 ring-blue-500/20 shadow-blue-500/10"
                       : "border-gray-200 hover:border-blue-300"
                   }`}
                 />
@@ -280,7 +285,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
                   required
                   className={`w-full px-4 py-3 bg-gray-50/80 border rounded-xl outline-none text-gray-800 placeholder-transparent peer transition-all duration-200 ${
                     isFocused.degreeProgram
-                      ? "border-blue-500  ring-blue-500/20 shadow-blue-500/10"
+                      ? "border-blue-500 ring-blue-500/20 shadow-blue-500/10"
                       : "border-gray-200 hover:border-blue-300"
                   }`}
                 />
@@ -311,7 +316,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
                   required
                   className={`w-full px-4 py-3 bg-gray-50/80 border rounded-xl outline-none text-gray-800 placeholder-transparent peer transition-all duration-200 ${
                     isFocused.hodReferralCode
-                      ? "border-blue-500  ring-blue-500/20 shadow-blue-500/10"
+                      ? "border-blue-500 ring-blue-500/20 shadow-blue-500/10"
                       : "border-gray-200 hover:border-blue-300"
                   }`}
                 />
@@ -343,7 +348,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
                 required
                 className={`w-full px-4 py-3 bg-gray-50/80 border rounded-xl outline-none text-gray-800 placeholder-transparent peer transition-all duration-200 ${
                   isFocused.companyName
-                    ? "border-blue-500  ring-blue-500/20 shadow-blue-500/10"
+                    ? "border-blue-500 ring-blue-500/20 shadow-blue-500/10"
                     : "border-gray-200 hover:border-blue-300"
                 }`}
               />
@@ -371,7 +376,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
               required
               className={`w-full px-4 py-3 bg-gray-50/80 border rounded-xl outline-none text-gray-800 placeholder-transparent peer transition-all duration-200 ${
                 isFocused.password
-                  ? "border-blue-500  ring-blue-500/20 shadow-blue-500/10"
+                  ? "border-blue-500 ring-blue-500/20 shadow-blue-500/10"
                   : "border-gray-200 hover:border-blue-300"
               }`}
             />
@@ -442,7 +447,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
                   }`}
                 >
                   {formData.gender === "male" && (
-                    <div className="w-2 h-2  rounded-full bg-white"></div>
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
                   )}
                 </div>
                 <input
@@ -513,7 +518,9 @@ const CombinedSignup = ({ userRole = "student" }) => {
             </Link>
             .
           </div>
+
           <div className="mt-4 flex justify-center">
+
   <div className="recaptcha-container">
     
     <ReCAPTCHA
@@ -525,29 +532,70 @@ const CombinedSignup = ({ userRole = "student" }) => {
     />
   </div>
 </div>
+=======
+            <div className="recaptcha-container">
+              <ReCAPTCHA
+                sitekey="6LdUPJcrAAAAAOTXcQy3X-1Tpi_dNt-UnCFxfq4Y"
+                size="normal"
+                onChange={handleCaptchaChange}
+                onExpired={handleCaptchaExpired}
+                onError={() => setVerified(false)}
+              />
+            </div>
+          </div>
 
           <div className="pt-4">
             <button
               type="submit"
-              disabled={!verified}
+              disabled={!verified || isLoading}
               onMouseEnter={() => setIsHoveringSubmit(true)}
               onMouseLeave={() => setIsHoveringSubmit(false)}
-              className={`relative overflow-hidden  w-full font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm shadow-lg ${
-                verified
-                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-blue-500/30"
+              className={`relative overflow-hidden w-full font-medium py-3 px-4 rounded-full transition-all duration-300 text-sm shadow-lg ${
+                verified && !isLoading
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 cursor-pointer text-white hover:shadow-blue-500/30"
                   : "bg-gray-300 cursor-not-allowed text-gray-500"
               }`}
             >
-              <span className="relative z-10 ">
-                Sign up as{" "}
-                {formData.role === "student" ? "Student" : "HR Professional"}
-              </span>
-              {verified && (
-                <span
-                  className={`absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full ${
-                    isHoveringSubmit ? "opacity-100" : "opacity-0"
-                  }`}
-                ></span>
+              {isLoading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span>Signing up...</span>
+                </div>
+              ) : (
+                <>
+                  <span className="relative z-10">
+                    Sign up as{" "}
+                    {formData.role === "student"
+                      ? "Student"
+                      : "HR Professional"}
+                  </span>
+                  {verified && !isLoading && (
+                    <span
+                      className={`absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full ${
+                        isHoveringSubmit ? "opacity-100" : "opacity-0"
+                      }`}
+                    ></span>
+                  )}
+                </>
               )}
             </button>
           </div>
