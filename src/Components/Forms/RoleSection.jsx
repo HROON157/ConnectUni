@@ -515,6 +515,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
           </div>
           <div className="mt-4 flex justify-center">
   <div className="recaptcha-container">
+    
     <ReCAPTCHA
         sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
       size="normal"
