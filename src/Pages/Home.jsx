@@ -1,4 +1,4 @@
-import { sections, heroContent } from "../data/homeData";
+import { sections, heroContent } from "../Data/homeData";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
