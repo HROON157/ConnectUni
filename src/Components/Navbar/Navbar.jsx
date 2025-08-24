@@ -490,7 +490,7 @@ const Navbar = () => {
 
             <button
               onClick={toggleMenu}
-              className="px-3 py-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gradient-to-r from-blue-500 to-purple-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gradient-to-r from-blue-500 to-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-expanded={isMenuOpen}
               aria-label="Toggle menu"
             >

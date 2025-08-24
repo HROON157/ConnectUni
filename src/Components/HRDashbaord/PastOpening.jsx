@@ -296,10 +296,6 @@ useEffect(() => {
 
                                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
-                          <div className="flex items-center space-x-1 text-blue-600">
-                            <HiOutlineBriefcase className="w-3 h-3 sm:w-4 sm:h-4" />
-                            <span className="font-medium">{job.applicationsCount || 0} Applications</span>
-                          </div>
                           <div className="flex items-center space-x-1 text-gray-500">
                             <HiOutlineClock className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>Posted {job.createdAt 
