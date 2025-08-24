@@ -133,12 +133,10 @@ const CombinedSignup = ({ userRole = "student" }) => {
             </div>
           </div>
         </div>
-
         <p className="text-sm text-gray-600 text-center mb-6 cursor-pointer">
           Sign up to connect with{" "}
           {formData.role === "student" ? "opportunities" : "talented students"}
         </p>
-
         <div className="flex justify-center space-x-4 mb-6">
           <button
             type="button"
@@ -163,7 +161,21 @@ const CombinedSignup = ({ userRole = "student" }) => {
             HR Professional
           </button>
         </div>
-
+        <div className="mb-6 text-center">
+          {formData.role === "student" ? (
+            <div className="text-blue-700 bg-blue-50 rounded-lg p-3 text-base font-semibold shadow-sm">
+              <span className="font-bold">As a Student:</span> Access top
+              internships, connect with verified companies, and build your
+              career profile.
+            </div>
+          ) : (
+            <div className="text-indigo-700 bg-indigo-50 rounded-lg p-3 text-base font-semibold shadow-sm">
+              <span className="font-bold">As an HR:</span> Discover talented
+              students, manage applications, and promote your company’s
+              opportunities.
+            </div>
+          )}
+        </div>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
             <input

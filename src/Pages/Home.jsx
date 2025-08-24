@@ -17,10 +17,18 @@ const Home = () => {
           >
             Welcome to{" "}
             <span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
-            Optera
+              Optera
             </span>
           </motion.h1>
-
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mt-3 text-lg sm:text-xl bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent font-semibold"
+          >
+            Top Students. Verified Companies. Meaningful Opportunities.
+          </motion.p>
+          
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -42,7 +50,11 @@ const Home = () => {
           className="px-6 sm:px-8 lg:px-12 py-10"
         >
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div className={index % 2 === 0 ? "order-1 lg:order-1" : "order-1 lg:order-2"}>
+            <div
+              className={
+                index % 2 === 0 ? "order-1 lg:order-1" : "order-1 lg:order-2"
+              }
+            >
               <div className="overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
                 <img
                   src={section.image}
