@@ -91,7 +91,7 @@ const Systems = () => {
           
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 via-purple-800 to-indigo-800 bg-clip-text text-transparent tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-500 to-indigo-800 bg-clip-text text-transparent tracking-tight">
                 Company Profile
               </h1>
               <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">

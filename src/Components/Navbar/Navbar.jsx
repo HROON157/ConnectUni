@@ -312,7 +312,7 @@ const Navbar = () => {
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-400 via-purple-500 to-indigo-500 rounded-full opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-300" />
               </div>
               <div className="flex flex-col font-giza">
-                <span className="text-gray-200  text-lg sm:text-xl  group-hover:text-indigo-400 transition-colors">
+                <span className="text-gray-200  text-lg sm:text-xl  group-hover:text-blue-400 transition-colors">
                   Optera
                 </span>
               </div>
@@ -446,7 +446,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={handleAuthAction}
-                className="px-6 py-2 cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full hover:from-blue-600 hover:to-purple-600 font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-6 py-2 cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full  font-medium transition-all duration-200 shadow-lg hover:shadow-blue-500/25 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Login
               </button>
@@ -482,7 +482,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={handleAuthAction}
-                className="px-3 py-1.5 cursor-pointer bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium transition-all duration-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium transition-all duration-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Login
               </button>

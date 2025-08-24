@@ -550,7 +550,7 @@ const HR_Home = () => {
                       <div className="flex flex-wrap gap-2 sm:gap-3">
                         <button
                           onClick={() => handleViewApplications(job)}
-                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center"
+                          className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-blue-700 text-white cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center"
                         >
                           <svg
                             className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1"

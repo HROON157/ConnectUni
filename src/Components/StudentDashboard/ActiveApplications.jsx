@@ -311,7 +311,7 @@ const ActiveApplications = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 sm:py-8 px-4 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-sm sm:text-base">Loading applications...</p>
         </div>
       </div>
@@ -349,7 +349,7 @@ const ActiveApplications = () => {
 <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 via-blue-800 to-indigo-800 bg-clip-text text-transparent mb-2 sm:mb-4">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-500 to-indigo-900 bg-clip-text text-transparent mb-2 sm:mb-4">
                 Active Applications
               </h1>
               <p className="text-gray-600 text-sm sm:text-lg">
@@ -378,7 +378,7 @@ const ActiveApplications = () => {
                 onClick={() => setActiveTab(tab)}
                 className={`px-3 py-2 sm:px-6 sm:py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base flex-1 sm:flex-none ${
                   activeTab === tab
-                    ? 'bg-white text-purple-600 shadow-sm'
+                    ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >

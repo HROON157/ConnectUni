@@ -108,13 +108,13 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-blue-50/20 py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-center items-center h-64">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-200 border-t-purple-600"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <HiOutlineClock className="w-6 h-6 text-purple-600" />
+                <HiOutlineClock className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
@@ -132,7 +132,7 @@ useEffect(() => {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-4 lg:space-y-0">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-gray-500 to-gray-700 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                 <HiOutlineArchiveBoxXMark className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
@@ -168,7 +168,7 @@ useEffect(() => {
                 <div className="text-xs sm:text-sm text-gray-500">Internships</div>
               </div>
               <div className="text-center">
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-600 mb-1">
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-600 mb-1">
                   {pastJobOpenings.filter(job => job.type === 'job').length}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-500">Full-time Jobs</div>
@@ -196,7 +196,7 @@ useEffect(() => {
                       onClick={() => setFilter(type)}
                       className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                         filter === type
-                          ? 'bg-purple-500 text-white shadow-md'
+                          ? 'bg-blue-500 text-white shadow-md'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                       }`}
                       style={{ fontFamily: "Public Sans" }}
@@ -242,7 +242,7 @@ useEffect(() => {
                                         <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 space-y-2 sm:space-y-0">
                         <div className="flex-1">
-                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors" style={{ fontFamily: "Public Sans" }}>
+                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors" style={{ fontFamily: "Public Sans" }}>
                             {job.jobTitle || 'Job Title'}
                           </h3>
                           <p className="text-gray-600 text-sm mb-2" style={{ fontFamily: "Public Sans" }}>
@@ -335,7 +335,7 @@ useEffect(() => {
                 <div className="flex flex-col gap-3 sm:gap-4 justify-center">
                   <Link
                     to="/add-new-opening"
-                    className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base"
+                    className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base"
                     style={{ fontFamily: "Public Sans" }}
                   >
                     <HiOutlineBriefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />

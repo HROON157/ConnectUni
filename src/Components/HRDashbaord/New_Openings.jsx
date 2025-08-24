@@ -152,7 +152,7 @@ const New_Openings = () => {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 space-y-4 lg:space-y-0">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                 <img src={JobLogo} alt="Job Logo" className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <div>
@@ -185,7 +185,7 @@ const New_Openings = () => {
               <span className="text-blue-600 font-semibold">Job Details</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-              <div className="bg-gradient-to-r from-purple-500 to-blue-600 h-2 rounded-full w-full"></div>
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full w-full"></div>
             </div>
           </div>
         </div>
@@ -368,9 +368,9 @@ const New_Openings = () => {
                     type="submit"
                     disabled={loading}
                     className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg ${
-                      loading 
-                        ? 'bg-gray-400 cursor-not-allowed' 
-                        : 'bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 transform hover:scale-105 active:scale-95 cursor-pointer'
+                      loading
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 active:scale-95 cursor-pointer'
                     } text-white`}
                     style={{ fontFamily: "Public Sans" }}
                   >

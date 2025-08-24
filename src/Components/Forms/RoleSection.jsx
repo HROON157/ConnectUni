@@ -169,7 +169,7 @@ const CombinedSignup = ({ userRole = "student" }) => {
               career profile.
             </div>
           ) : (
-            <div className="text-indigo-700 bg-indigo-50 rounded-lg p-3 text-base font-semibold shadow-sm">
+            <div className="text-blue-700 bg-blue-50 rounded-lg p-3 text-base font-semibold shadow-sm">
               <span className="font-bold">As an HR:</span> Discover talented
               students, manage applications, and promote your company’s
               opportunities.
