@@ -98,7 +98,6 @@ const New_Openings = () => {
       const jobData = {
         ...formData,
         status: 'active',
-        applicationsCount: 0
       };
       
 

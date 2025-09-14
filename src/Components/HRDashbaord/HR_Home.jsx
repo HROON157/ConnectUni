@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getDashboardData } from "../Charts/ChartData";
+import { cleanupJobsListener, getDashboardData, getMockData } from "../Charts/ChartData";
 import {
   PieChartCard,
   BarChartCard,
@@ -255,24 +255,29 @@ const HR_Home = () => {
     );
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getDashboardData();
-        setDashboardData(data);
-      } catch (error) {
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      
+      const data = await getDashboardData((updatedJobsList) => {
+        const updatedData = getMockData();
+        setDashboardData(updatedData);
+      });
+      
+      setDashboardData(data);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      } finally {
-        setLoading(false);
-      }
-    };
+  fetchData();
 
-    fetchData();
-
-    const interval = setInterval(fetchData, 300000);
-    return () => clearInterval(interval);
-  }, []);
-
+  return () => {
+    cleanupJobsListener();
+  };
+}, []);
   useEffect(() => {
     const fetchData = async () => {
       try {

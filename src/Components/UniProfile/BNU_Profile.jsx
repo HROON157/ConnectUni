@@ -22,10 +22,10 @@ const BNU_Profile = () => {
     setLoading(true);
     try {
       
-      const studentsQuery = query(
-        collection(db, "students"),
-        where("university", "==", "BNU")
-      );
+const studentsQuery = query(
+  collection(db, "students"),
+  where("university", "in", ["BNU", "Beaconhouse National University (BNU)","Beaconhouse National University "])
+);
       const studentsSnapshot = await getDocs(studentsQuery);
       
       const studentIds = [];
@@ -49,7 +49,6 @@ const BNU_Profile = () => {
           }
         });
       }
-
       setBnuStudents(profiles);
     } catch (error) {
     } finally {
@@ -397,10 +396,10 @@ const BNU_Profile = () => {
                   </p>
                 </div>
 
-                {selectedStudent.bio && (
+                {selectedStudent.about && (
                   <div className="mb-3 xs:mb-4 sm:mb-6">
                     <h4 className="font-semibold text-gray-900 mb-2 font-['Public_Sans'] text-xs xs:text-sm sm:text-base">About</h4>
-                    <p className="text-gray-700 leading-relaxed text-xs xs:text-sm sm:text-base">{selectedStudent.bio}</p>
+                    <p className="text-gray-700 leading-relaxed text-xs xs:text-sm sm:text-base">{selectedStudent.about}</p>
                   </div>
                 )}
 
@@ -408,14 +407,6 @@ const BNU_Profile = () => {
                 <div className="border-t border-gray-200 pt-3 xs:pt-4 sm:pt-6">
                   <h4 className="font-semibold text-gray-900 mb-2 xs:mb-3 font-['Public_Sans'] text-xs xs:text-sm sm:text-base">Contact & Links</h4>
                   <div className="space-y-2 xs:space-y-3">
-                    {selectedStudent.email && (
-                      <div className="flex items-center space-x-2 xs:space-x-3">
-                        <svg className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        <span className="text-gray-700 text-xs xs:text-sm sm:text-base break-all">{selectedStudent.email}</span>
-                      </div>
-                    )}
                     {selectedStudent.linkedin && (
                       <div className="flex items-center space-x-2 xs:space-x-3">
                         <svg className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
